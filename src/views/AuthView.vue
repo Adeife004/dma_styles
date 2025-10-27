@@ -2,18 +2,28 @@
   <!-- auth-wrapper -->
   <div class="auth-wrapper">
     <!-- auth-container -->
-    <div class="auth-container" :class="{ 'flip-active': showSignup }">
+    <div
+      class="auth-container"
+      :class="{ 'flip-active': showSignup, loaded: isLoaded }"
+      data-aos="fade-up"
+      data-aos-duration="1000"
+      data-aos-delay="200"
+    >
       <!-- LEFT PANEL -->
       <div class="auth-panel">
-        <div class="logo-container">
+        <div class="logo-container" data-aos="zoom-in">
           <img src="../assets/logo.jpg" alt="Brand Logo" class="app-logo" />
         </div>
 
         <div class="panel-text">
-          <h2 v-if="!showSignup">Welcome Back</h2>
-          <h2 v-else>Hello Friend</h2>
-          <p v-if="!showSignup">To stay connected, please log in with your personal information.</p>
-          <p v-else>Enter your details and start your journey with us.</p>
+          <h2 data-aos="fade-down" data-aos-delay="200" v-if="!showSignup">Welcome Back</h2>
+          <h2 data-aos="fade-down" data-aos-delay="200" v-else>Hello</h2>
+          <p data-aos="fade-up" data-aos-delay="300" v-if="!showSignup">
+            Please log in with your personal information.
+          </p>
+          <p data-aos="fade-up" data-aos-delay="400" v-else>
+            Kindly enter your details and start your journey with us.
+          </p>
 
           <button class="panel-btn" @click="toggleForm">
             {{ showSignup ? 'Sign In' : 'Sign Up' }}
@@ -25,9 +35,9 @@
       <div class="auth-card">
         <!-- LOGIN FORM -->
         <form class="auth-face front-face" @submit.prevent="loginUser">
-          <h2>Sign In</h2>
+          <h2 data-aos="fade-down">Sign In</h2>
 
-          <div class="social-container">
+          <div class="social-container" data-aos="zoom-in" data-aos-delay="200">
             <a href="#" id="facebookBtn" @click.prevent="facebookSignIn">
               <i class="fab fa-facebook-f"></i>
             </a>
@@ -37,10 +47,12 @@
             <a href="#"><i class="fab fa-apple"></i></a>
           </div>
 
-          <p class="divider"><span>or</span></p>
+          <p class="divider" data-aos="fade-up" data-aos-delay="400"><span>or</span></p>
 
-          <label for="loginEmail">Email</label>
+          <label data-aos="fade-right" data-aos-delay="600" for="loginEmail">Email</label>
           <input
+            data-aos="fade-left"
+            data-aos-delay="700"
             id="loginEmail"
             v-model="loginEmail"
             type="email"
@@ -48,8 +60,10 @@
             required
           />
 
-          <label for="loginPassword">Password</label>
+          <label data-aos="fade-right" data-aos-delay="800" for="loginPassword">Password</label>
           <input
+            data-aos="fade-left"
+            data-aos-delay="900"
             id="loginPassword"
             v-model="loginPassword"
             type="password"
@@ -57,7 +71,13 @@
             required
           />
 
-          <button id="loginBtn" class="btn" type="submit">Login</button>
+          <p class="forgot-password">
+            <a href="#" @click.prevent="forgotPassword">Forgot Password?</a>
+          </p>
+
+          <button data-aos="zoom-in" data-aos-delay="900" id="loginBtn" class="btn" type="submit">
+            Login
+          </button>
         </form>
 
         <!-- SIGNUP FORM -->
@@ -76,41 +96,138 @@
 
           <p class="divider"><span>or</span></p>
 
-          <label for="firstName">First Name:</label>
+          <!-- First Name + Last Name -->
+          <div class="form-row">
+            <!-- First Name -->
+            <div class="form-group password-group">
+              <label data-aos="fade-right" data-aos-delay="700" for="firstName">First Name</label>
+              <div class="password-wrapper">
+                <input
+                  data-aos="fade-left"
+                  data-aos-delay="600"
+                  id="firstName"
+                  type="text"
+                  v-model="fname"
+                  placeholder="Enter your first name"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="form-group password-group">
+              <label data-aos="fade-left" data-aos-delay="700" for="confirmPassword"
+                >Last Name</label
+              >
+              <div class="password-wrapper">
+                <input
+                  data-aos="fade-left"
+                  data-aos-delay="600"
+                  id="lastName"
+                  type="text"
+                  v-model="lname"
+                  placeholder="Enter your last name"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- <label data-aos="fade-right" data-aos-delay="500" for="fullName">Full Name</label>
+          <input data-aos="fade-left" data-aos-delay="600" id="fullName" type="text" v-model="fname"
+            placeholder="Enter your full name" required /> -->
+
+          <!-- Email + Phone -->
+          <div class="form-row">
+            <div class="form-group">
+              <label data-aos="fade-right" data-aos-delay="700" for="signupEmail">Email</label>
+              <input
+                id="signupEmail"
+                v-model="signupEmail"
+                type="email"
+                placeholder="Enter your email"
+                required
+                data-aos="fade-left"
+                data-aos-delay="800"
+              />
+            </div>
+
+            <div class="form-group">
+              <label data-aos="fade-right" data-aos-delay="700" for="phoneNumber"
+                >Phone Number</label
+              >
+              <input
+                id="phoneNumber"
+                v-model="phoneNumber"
+                type="tel"
+                placeholder="Enter your phone number"
+                required
+                data-aos="fade-left"
+                data-aos-delay="800"
+              />
+            </div>
+          </div>
+
+          <!-- Address -->
+          <label data-aos="fade-right" data-aos-delay="700" for="address">Address</label>
           <input
+            id="address"
+            v-model="address"
             type="text"
-            v-model="fname"
-            id="firstName"
-            placeholder="Enter Your First Name"
+            placeholder="Enter your address"
             required
+            data-aos="fade-left"
+            data-aos-delay="800"
           />
 
-          <label for="lastName">Last Name:</label>
-          <input
-            type="text"
-            v-model="lname"
-            id="lastName"
-            placeholder="Enter Your Last Name"
-            required
-          />
+          <!-- Password + Confirm Password -->
+          <div class="form-row">
+            <!-- Password -->
+            <div class="form-group password-group">
+              <label data-aos="fade-right" data-aos-delay="700" for="signupPassword"
+                >Password</label
+              >
+              <div class="password-wrapper">
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  id="signupPassword"
+                  v-model="signupPassword"
+                  placeholder="Enter your password"
+                  required
+                  data-aos="fade-left"
+                  data-aos-delay="800"
+                />
+                <i
+                  class="fas"
+                  :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"
+                  @click="showPassword = !showPassword"
+                ></i>
+              </div>
+            </div>
 
-          <label for="signupEmail">Email</label>
-          <input
-            id="signupEmail"
-            v-model="signupEmail"
-            type="email"
-            placeholder="Enter your email"
-            required
-          />
-
-          <label for="signupPassword">Password</label>
-          <input
-            id="signupPassword"
-            v-model="signupPassword"
-            type="password"
-            placeholder="Enter your password"
-            required
-          />
+            <!-- Confirm Password -->
+            <div class="form-group password-group">
+              <label data-aos="fade-right" data-aos-delay="700" for="confirmPassword"
+                >Confirm Password</label
+              >
+              <div class="password-wrapper">
+                <input
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  id="confirmPassword"
+                  v-model="confirmPassword"
+                  placeholder="Re-enter your password"
+                  required
+                  data-aos="fade-left"
+                  data-aos-delay="800"
+                />
+                <i
+                  class="fas"
+                  :class="showConfirmPassword ? 'fa-eye' : 'fa-eye-slash'"
+                  @click="showConfirmPassword = !showConfirmPassword"
+                ></i>
+              </div>
+            </div>
+          </div>
 
           <button id="signUpBtn" class="btn" type="submit">Sign Up</button>
         </form>
@@ -130,8 +247,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { auth } from '../firebase'
+import { ref, watch, onMounted, nextTick } from 'vue'
+import { auth, db } from '../firebase'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import Swal from 'sweetalert2'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -139,19 +259,26 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
   signInWithPopup,
+  sendPasswordResetEmail,
 } from 'firebase/auth'
+import { ref as dbRef, set, get } from 'firebase/database'
 
-// =======================
 // Reactive Form State
-// =======================
+const isLoaded = ref(false)
 const showSignup = ref(true)
 const fname = ref('')
 const lname = ref('')
 const signupEmail = ref('')
 const signupPassword = ref('')
+const confirmPassword = ref('')
 const loginEmail = ref('')
 const loginPassword = ref('')
+const phoneNumber = ref('')
+const address = ref('')
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 
+// Providers
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
 
@@ -161,121 +288,379 @@ const toastMessage = ref('')
 const showToast = ref(false)
 const toastType = ref('success')
 
-// =======================
-// Toggle Between Forms
-// =======================
+onMounted(async () => {
+  await nextTick()
+
+  // Wait for route transition to complete
+  setTimeout(() => {
+    // Initialize AOS
+    AOS.init({
+      duration: 1200,
+      easing: 'ease-in-out',
+      once: false,
+      offset: 0,
+      delay: 0,
+      disable: false,
+    })
+
+    // Make container visible
+    setTimeout(() => {
+      isLoaded.value = true
+
+      // Refresh AOS after container is visible
+      setTimeout(() => {
+        AOS.refresh()
+      }, 150)
+    }, 200)
+  }, 100)
+})
+
+// Watch for form toggle and refresh AOS
+watch(showSignup, () => {
+  setTimeout(() => {
+    AOS.refreshHard()
+  }, 100)
+})
+
+// Toggle Between Forms && Reset
 function toggleForm() {
   showSignup.value = !showSignup.value
 }
 
-// =======================
-// Reset Fields
-// =======================
 function resetFields() {
   fname.value = ''
   lname.value = ''
   signupEmail.value = ''
   signupPassword.value = ''
+  confirmPassword.value = ''
+  phoneNumber.value = ''
+  address.value = ''
   loginEmail.value = ''
   loginPassword.value = ''
 }
 
-// =======================
-// Toast Functions
-// =======================
-function showToastMessage(message, type = 'success') {
-  toastMessage.value = message
-  toastType.value = type
-  showToast.value = true
-  setTimeout(() => (showToast.value = false), 3000)
-}
-
-// =======================
-// Handle Signup
-// =======================
+// SignUp User & Save to Realtime Database
 async function signupUser() {
   loading.value = true
   try {
     if (signupPassword.value.length < 6) {
-      showToastMessage('Password must be at least 6 characters long.', 'error')
+      Swal.fire({
+        icon: 'error',
+        title: 'Weak Password',
+        text: 'Password must be at least 6 characters long.',
+        confirmButtonColor: '#000000',
+        background: '#f9f9f9',
+        color: '#333',
+        backdrop: `
+          rgba(0,0,0,0.4)
+          url("../assets/logo.jpg")
+          left top
+          no-repeat
+        `,
+      })
+      loading.value = false
       return
     }
 
-    await createUserWithEmailAndPassword(auth, signupEmail.value, signupPassword.value)
-    showToastMessage(`Welcome ${fname.value}! Account created successfully.`, 'success')
+    if (signupPassword.value !== confirmPassword.value) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Password Mismatch',
+        text: 'Passwords do not match.',
+        confirmButtonColor: '#000000',
+        background: '#f9f9f9',
+        color: '#333',
+        backdrop: `
+          rgba(0,0,0,0.4)
+          url("../assets/logo.jpg")
+          right top
+          no-repeat
+        `,
+      })
+      loading.value = false
+      return
+    }
 
-    await signInWithEmailAndPassword(auth, signupEmail.value, signupPassword.value)
-    showToastMessage(`You’re now signed in, ${fname.value}!`, 'info')
+    // Create User in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      signupEmail.value,
+      signupPassword.value,
+    )
+    const user = userCredential.user
 
-    resetFields()
-    showSignup.value = false
+    // Save additional user info to Realtime Database
+    const userRef = dbRef(db, `users/${user.uid}`)
+    await set(userRef, {
+      firstName: fname.value,
+      lastName: lname.value,
+      email: signupEmail.value,
+      phoneNumber: phoneNumber.value,
+      address: address.value,
+      createdAt: new Date().toISOString(),
+    })
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Account Created Successfully!',
+      html: `
+        <h3 style="margin-bottom:5px;">Welcome <strong>${fname.value} ${lname.value}</strong></h3>
+        <p style="font-size:15px;">Your account has been created successfully.</p>
+        <p>Please sign in to continue to <strong>DMA Styles</strong>.</p>
+      `,
+      icon: 'success',
+      showConfirmButton: true,
+      confirmButtonText: 'Go to Sign In',
+      confirmButtonColor: '#000000',
+      background: '#ffffff',
+      color: '#222',
+      allowOutsideClick: false,
+    }).then(() => {
+      // Redirect user to login form
+      showSignup.value = false
+      resetFields()
+    })
   } catch (error) {
-    showToastMessage(error.message, 'error')
+    Swal.fire({
+      icon: 'error',
+      title: 'Signup Failed',
+      text: error.message,
+      confirmButtonColor: '#000000',
+      background: '#f9f9f9',
+      color: '#333',
+    })
   } finally {
     loading.value = false
   }
 }
 
-// =======================
-// Handle Login
-// =======================
+// Login
 async function loginUser() {
   loading.value = true
   try {
+    if (!loginEmail.value || !loginPassword.value) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Fields ⚠️',
+        text: 'Please enter both your email and password.',
+        confirmButtonColor: '#000000',
+        background: '#f9f9f9',
+        color: '#333',
+      })
+      loading.value = false
+      return
+    }
+
     const userCredential = await signInWithEmailAndPassword(
       auth,
       loginEmail.value,
       loginPassword.value,
     )
-    showToastMessage(`Welcome back, ${userCredential.user.email}!`, 'success')
+    Swal.fire({
+      title: 'Welcome Back 👋',
+      html: `
+        <h3 style="margin-bottom:5px;">Hello, <strong>${user.email}</strong></h3>
+        <p style="font-size:15px;">You have successfully logged in to <strong>DMA Styles</strong>.</p>
+      `,
+      icon: 'success',
+      showConfirmButton: true,
+      confirmButtonText: 'Go to Dashboard',
+      confirmButtonColor: '#000000',
+      background: '#ffffff',
+      color: '#222',
+      allowOutsideClick: false,
+    }).then(() => {
+      window.location.href = '/dashboard'
+    })
   } catch (error) {
-    showToastMessage(error.message, 'error')
+    let errorMessage = 'Login failed. Please check your credentials.'
+
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'No account found with this email.'
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Incorrect password. Please try again.'
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Invalid email format.'
+    }
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Error 🚫',
+      text: errorMessage,
+      confirmButtonColor: '#000000',
+      background: '#f9f9f9',
+      color: '#333',
+    })
   } finally {
     loading.value = false
   }
 }
 
-// =======================
-// Google Sign-In
-// =======================
+// Google Sign-In with profile completion check
 async function googleSignIn() {
   loading.value = true
   try {
     const result = await signInWithPopup(auth, googleProvider)
     const user = result.user
 
-    showToastMessage(`Signed in as ${user.displayName || 'User'} via Google!`, 'success')
+    // Check if user profile is complete in database
+    const userRef = dbRef(db, `users/${user.uid}`)
+    const snapshot = await get(userRef)
 
-    // Redirect to dashboard after sign-in
-    setTimeout(() => {
-      window.location.href = '/dashboard' // or your actual dashboard route
-    }, 1200)
+    if (snapshot.exists()) {
+      const userData = snapshot.val()
+      // Check if phone and address exist
+      if (userData.phoneNumber && userData.address) {
+        // Profile complete, go to dashboard
+        Swal.fire({
+          title: 'Welcome Back! 👋',
+          html: `
+            <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
+            <p style="font-size:15px;">Successfully signed in via Google.</p>
+          `,
+          icon: 'success',
+          showConfirmButton: true,
+          confirmButtonText: 'Go to Dashboard',
+          confirmButtonColor: '#000000',
+          background: '#ffffff',
+          color: '#222',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.location.href = '/dashboard'
+        })
+      } else {
+        // Profile incomplete, go to complete profile
+        Swal.fire({
+          title: 'Complete Your Profile',
+          html: `
+            <p style="font-size:15px;">Please provide additional information to continue.</p>
+          `,
+          icon: 'info',
+          showConfirmButton: true,
+          confirmButtonText: 'Continue',
+          confirmButtonColor: '#000000',
+          background: '#ffffff',
+          color: '#222',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.location.href = '/complete-profile'
+        })
+      }
+    } else {
+      // New user, go to complete profile
+      Swal.fire({
+        title: `Welcome to DMA Styles! 🎉`,
+        html: `
+          <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
+          <p style="font-size:15px;">Let's complete your profile to get started.</p>
+        `,
+        icon: 'success',
+        showConfirmButton: true,
+        confirmButtonText: 'Complete Profile',
+        confirmButtonColor: '#000000',
+        background: '#ffffff',
+        color: '#222',
+        allowOutsideClick: false,
+      }).then(() => {
+        window.location.href = '/complete-profile'
+      })
+    }
   } catch (error) {
-    showToastMessage('Google Sign-In failed: ' + error.message, 'error')
+    console.error('Google Sign-In error:', error)
+    Swal.fire({
+      icon: 'error',
+      title: 'Sign-In Failed',
+      text: 'Google Sign-In failed: ' + error.message,
+      confirmButtonColor: '#000000',
+      background: '#f9f9f9',
+      color: '#333',
+    })
   } finally {
     loading.value = false
   }
 }
 
-// =======================
-// Facebook Sign-In
-// =======================
+// Facebook Sign-In with profile completion check
 async function facebookSignIn() {
   loading.value = true
   try {
     const result = await signInWithPopup(auth, facebookProvider)
     const user = result.user
-    showToastMessage(`Signed in as ${user.displayName || 'User'} via Facebook!`, 'success')
+
+    // Check if user profile is complete
+    const userRef = dbRef(db, `users/${user.uid}`)
+    const snapshot = await get(userRef)
+
+    if (snapshot.exists()) {
+      const userData = snapshot.val()
+      if (userData.phoneNumber && userData.address) {
+        Swal.fire({
+          title: 'Welcome Back! 👋',
+          html: `
+            <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
+            <p style="font-size:15px;">Successfully signed in via Facebook.</p>
+          `,
+          icon: 'success',
+          showConfirmButton: true,
+          confirmButtonText: 'Go to Dashboard',
+          confirmButtonColor: '#000000',
+          background: '#ffffff',
+          color: '#222',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.location.href = '/dashboard'
+        })
+      } else {
+        Swal.fire({
+          title: 'Complete Your Profile',
+          html: `
+            <p style="font-size:15px;">Please provide additional information to continue.</p>
+          `,
+          icon: 'info',
+          showConfirmButton: true,
+          confirmButtonText: 'Continue',
+          confirmButtonColor: '#000000',
+          background: '#ffffff',
+          color: '#222',
+          allowOutsideClick: false,
+        }).then(() => {
+          window.location.href = '/complete-profile'
+        })
+      }
+    } else {
+      Swal.fire({
+        title: `Welcome to DMA Styles! 🎉`,
+        html: `
+          <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
+          <p style="font-size:15px;">Let's complete your profile to get started.</p>
+        `,
+        icon: 'success',
+        showConfirmButton: true,
+        confirmButtonText: 'Complete Profile',
+        confirmButtonColor: '#000000',
+        background: '#ffffff',
+        color: '#222',
+        allowOutsideClick: false,
+      }).then(() => {
+        window.location.href = '/complete-profile'
+      })
+    }
   } catch (error) {
-    showToastMessage('Facebook Sign-In failed: ' + error.message, 'error')
+    console.error('Facebook Sign-In error:', error)
+    Swal.fire({
+      icon: 'error',
+      title: 'Sign-In Failed',
+      text: 'Facebook Sign-In failed: ' + error.message,
+      confirmButtonColor: '#000000',
+      background: '#f9f9f9',
+      color: '#333',
+    })
   } finally {
     loading.value = false
   }
 }
 
-// =======================
 // Auth State Listener
-// =======================
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log('Active user:', user.email)
@@ -283,12 +668,68 @@ onAuthStateChanged(auth, (user) => {
     console.log('No active user.')
   }
 })
+
+async function forgotPassword() {
+  const { value: email } = await Swal.fire({
+    title: 'Reset Your Password ',
+    html: `
+      <p style="margin-bottom:15px;">Enter the email you used to register with <strong>DMA Styles</strong>.</p>
+      <input type="email" id="resetEmail" class="swal2-input" placeholder="Enter your email" style="text-align:center;">
+    `,
+    confirmButtonText: 'Send Reset Link',
+    confirmButtonColor: '#000000',
+    background: '#ffffff',
+    color: '#222',
+    focusConfirm: false,
+    preConfirm: () => {
+      const resetEmail = document.getElementById('resetEmail').value
+      if (!resetEmail) {
+        Swal.showValidationMessage('Please enter your email address.')
+      }
+      return resetEmail
+    },
+  })
+
+  if (!email) return // user canceled
+
+  try {
+    await sendPasswordResetEmail(auth, email)
+    Swal.fire({
+      icon: 'success',
+      title: 'Email Sent ',
+      html: `
+        <p>A password reset link has been sent to:</p>
+        <strong>${email}</strong>
+        <p style="margin-top:10px;">Check your inbox or spam folder to continue.</p>
+      `,
+      confirmButtonText: 'OK',
+      confirmButtonColor: '#000000',
+      background: '#f9f9f9',
+      color: '#333',
+    })
+  } catch (error) {
+    let errorMessage = 'Unable to send reset link. Please try again.'
+
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'No account found with that email.'
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Please enter a valid email address.'
+    }
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Reset Failed 🚫',
+      text: errorMessage,
+      confirmButtonColor: '#000000',
+      background: '#f9f9f9',
+      color: '#333',
+    })
+  }
+}
 </script>
 
 <style scoped>
-/* =============================
-   GLOBAL
-============================= */
+/* GLOBAL */
 .auth-wrapper {
   background: linear-gradient(135deg, #000, #1a1a1a);
   min-height: 100vh;
@@ -298,13 +739,14 @@ onAuthStateChanged(auth, (user) => {
   color: #fff;
 }
 
-/* =============================
-   CONTAINER
-============================= */
+/* CONTAINER */
 .auth-container {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
   display: flex;
   background: #111;
-  width: 850px;
+  width: 1000px;
   height: 95vh;
   border-radius: 20px;
   box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
@@ -314,9 +756,12 @@ onAuthStateChanged(auth, (user) => {
   transition: all 0.8s ease;
 }
 
-/* =============================
-   LEFT PANEL
-============================= */
+.auth-container.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* LEFT PANEL */
 .auth-panel {
   width: 45%;
   background: #000;
@@ -364,12 +809,11 @@ onAuthStateChanged(auth, (user) => {
 }
 
 .panel-btn:hover {
-  background: #fff;
+  background: #917f16;
+  color: #f1f1f1;
 }
 
-/* =============================
-   CARD (RIGHT SIDE)
-============================= */
+/* CARD (RIGHT SIDE) */
 .auth-card {
   position: absolute;
   right: 0;
@@ -387,9 +831,7 @@ onAuthStateChanged(auth, (user) => {
   transform: rotateY(180deg);
 }
 
-/* =============================
-   FACES (FRONT & BACK)
-============================= */
+/* FACES (FRONT & BACK) */
 .auth-face {
   position: absolute;
   backface-visibility: hidden;
@@ -410,9 +852,7 @@ onAuthStateChanged(auth, (user) => {
   transform: rotateY(180deg);
 }
 
-/* =============================
-   FORM ELEMENTS
-============================= */
+/* FORM ELEMENTS */
 .auth-face h2 {
   text-align: center;
   color: #ffd700;
@@ -459,7 +899,8 @@ input:focus {
 }
 
 .btn:hover {
-  background: #fff;
+  background: #917f16;
+  color: #f1f1f1;
 }
 
 .social-container {
@@ -506,9 +947,77 @@ input:focus {
   transform: translateY(-50%);
 }
 
-/* =============================
-   RESPONSIVE DESIGN
-============================= */
+.form-row {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  background: #111;
+  border: 1px solid #444;
+  color: #f5f5f5;
+  padding: 10px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 6px #d4af37;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  background: #111;
+  border: 1px solid #444;
+  color: #f5f5f5;
+  padding: 10px 40px 10px 12px;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.password-wrapper i {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: #888;
+  font-size: 14px;
+  transition:
+    color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.password-wrapper i:hover {
+  transform: scale(1.1);
+}
+
+input:focus {
+  border-color: #d4af37;
+  box-shadow: 0 0 6px #d4af37;
+}
+
+.forgot-password a {
+  text-decoration: none;
+  color: #ccc;
+  font-size: 15px;
+}
+
+/* RESPONSIVE DESIGN */
 @media (max-width: 1024px) {
   .auth-container {
     width: 90%;
@@ -528,7 +1037,7 @@ input:focus {
   .auth-container {
     flex-direction: column;
     width: 90%;
-    height: 150vh;
+    height: 180vh;
     perspective: 1000px;
   }
 
@@ -543,7 +1052,7 @@ input:focus {
   .auth-card {
     position: relative;
     width: 100%;
-    height: 150vh;
+    height: 160vh;
     border-left: none;
     border-radius: 0 0 20px 20px;
     transform-style: preserve-3d;
@@ -586,6 +1095,10 @@ input:focus {
 
   .btn {
     padding: 8px;
+  }
+
+  .form-row {
+    flex-direction: column;
   }
 
   input {
