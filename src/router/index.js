@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import AuthView from '@/views/AuthView.vue'
 import PreloaderView from '@/views/PreloaderView.vue'
-import CompleteProfile from '@/views/CompleteProfile.vue'
+import CompleteProfile from '../views/CompleteProfile.vue'
 import DashboardView from '@/views/DashboardView.vue'
 
 const router = createRouter({
@@ -20,9 +20,10 @@ const router = createRouter({
       meta: { transition: 'fade' },
     },
     {
-      path: '/complete-profile',
+      path: '/completeprofile',
       name: 'CompleteProfile',
       component: CompleteProfile,
+      meta: { transition: 'fade' },
     },
     {
       path: '/dashboard',

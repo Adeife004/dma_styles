@@ -513,7 +513,7 @@ async function googleSignIn() {
       if (userData.phoneNumber && userData.address) {
         // Profile complete, go to dashboard
         Swal.fire({
-          title: 'Welcome Back! 👋',
+          title: 'Welcome Back!',
           html: `
             <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
             <p style="font-size:15px;">Successfully signed in via Google.</p>
@@ -549,7 +549,7 @@ async function googleSignIn() {
     } else {
       // New user, go to complete profile
       Swal.fire({
-        title: `Welcome to DMA Styles! 🎉`,
+        title: `Welcome to DMA Styles!`,
         html: `
           <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
           <p style="font-size:15px;">Let's complete your profile to get started.</p>
@@ -595,7 +595,7 @@ async function facebookSignIn() {
       const userData = snapshot.val()
       if (userData.phoneNumber && userData.address) {
         Swal.fire({
-          title: 'Welcome Back! 👋',
+          title: 'Welcome Back!',
           html: `
             <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
             <p style="font-size:15px;">Successfully signed in via Facebook.</p>
@@ -629,7 +629,7 @@ async function facebookSignIn() {
       }
     } else {
       Swal.fire({
-        title: `Welcome to DMA Styles! 🎉`,
+        title: `Welcome to DMA Styles!`,
         html: `
           <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
           <p style="font-size:15px;">Let's complete your profile to get started.</p>
