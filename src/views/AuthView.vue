@@ -22,7 +22,7 @@
             Please log in with your personal information.
           </p>
           <p data-aos="fade-up" data-aos-delay="400" v-else>
-            Kindly enter your details and start your journey with us.
+            Kindly enter your details to your journey with us.
           </p>
 
           <button class="panel-btn" @click="toggleForm">
@@ -60,16 +60,24 @@
             required
           />
 
-          <label data-aos="fade-right" data-aos-delay="800" for="loginPassword">Password</label>
-          <input
-            data-aos="fade-left"
-            data-aos-delay="900"
-            id="loginPassword"
-            v-model="loginPassword"
-            type="password"
-            placeholder="Enter your password"
-            required
-          />
+          <label data-aos="fade-right" data-aos-delay="700" for="loginPassword">Password</label>
+          <div class="password-wrapper">
+            <input
+              :type="showPassword ? 'text' : 'password'"
+              id="loginPassword"
+              v-model="loginPassword"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              required
+              data-aos="fade-left"
+              data-aos-delay="800"
+            />
+            <i
+              class="fas"
+              :class="showPassword ? 'fa-eye' : 'fa-eye-slash'"
+              @click="showPassword = !showPassword"
+            ></i>
+          </div>
 
           <p class="forgot-password">
             <a href="#" @click.prevent="forgotPassword">Forgot Password?</a>
@@ -192,6 +200,7 @@
                   :type="showPassword ? 'text' : 'password'"
                   id="signupPassword"
                   v-model="signupPassword"
+                  autocomplete="new-password"
                   placeholder="Enter your password"
                   required
                   data-aos="fade-left"
@@ -216,6 +225,7 @@
                   id="confirmPassword"
                   v-model="confirmPassword"
                   placeholder="Re-enter your password"
+                  autocomplete="new-password"
                   required
                   data-aos="fade-left"
                   data-aos-delay="800"
@@ -248,6 +258,7 @@
 
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { auth, db } from '../firebase'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
@@ -265,7 +276,6 @@ import { ref as dbRef, set, get } from 'firebase/database'
 
 // Reactive Form State
 const isLoaded = ref(false)
-const showSignup = ref(true)
 const fname = ref('')
 const lname = ref('')
 const signupEmail = ref('')
@@ -277,6 +287,9 @@ const phoneNumber = ref('')
 const address = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+const route = useRoute()
+const router = useRouter()
+const showSignup = ref(false)
 
 // Providers
 const googleProvider = new GoogleAuthProvider()
@@ -287,6 +300,21 @@ const loading = ref(false)
 const toastMessage = ref('')
 const showToast = ref(false)
 const toastType = ref('success')
+
+// Watch URL changes → update panel
+watch(
+  () => route.query.mode,
+  (mode) => {
+    showSignup.value = mode === 'signup'
+  },
+  { immediate: true },
+)
+
+//  When user toggles panel → update URL
+watch(showSignup, (newValue) => {
+  const newMode = newValue ? 'signup' : 'login'
+  router.replace({ path: '/auth', query: { mode: newMode } })
+})
 
 onMounted(async () => {
   await nextTick()
@@ -400,6 +428,18 @@ async function signupUser() {
       createdAt: new Date().toISOString(),
     })
 
+    // ✅ Store user in localStorage
+    const userData = {
+      uid: user.uid,
+      firstName: fname.value,
+      lastName: lname.value,
+      email: signupEmail.value,
+      phoneNumber: phoneNumber.value,
+      address: address.value,
+      createdAt: new Date().toISOString(),
+    }
+    localStorage.setItem('user', JSON.stringify(userData))
+
     Swal.fire({
       icon: 'success',
       title: 'Account Created Successfully!',
@@ -424,7 +464,7 @@ async function signupUser() {
     Swal.fire({
       icon: 'error',
       title: 'Signup Failed',
-      text: error.message,
+      text: 'Please Try Again',
       confirmButtonColor: '#000000',
       background: '#f9f9f9',
       color: '#333',
@@ -437,11 +477,15 @@ async function signupUser() {
 // Login
 async function loginUser() {
   loading.value = true
+
   try {
-    if (!loginEmail.value || !loginPassword.value) {
+    const email = (loginEmail.value || '').trim()
+    const password = (loginPassword.value || '').trim()
+
+    if (!email || !password) {
       Swal.fire({
         icon: 'warning',
-        title: 'Missing Fields ⚠️',
+        title: 'Missing Fields',
         text: 'Please enter both your email and password.',
         confirmButtonColor: '#000000',
         background: '#f9f9f9',
@@ -451,15 +495,36 @@ async function loginUser() {
       return
     }
 
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      loginEmail.value,
-      loginPassword.value,
-    )
-    Swal.fire({
-      title: 'Welcome Back 👋',
+    // Debugging: show values (remove in production)
+    console.log('Attempting sign in with:', { email, passwordLength: password.length })
+
+    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+
+    // Debugging: confirm returned user
+    console.log('Signed in userCredential:', userCredential)
+
+    const signedInEmail = userCredential.user?.email ?? email
+
+    // ✅ Fetch user data from Firebase Realtime DB and store locally
+    const userRef = dbRef(db, `users/${userCredential.user.uid}`)
+    const snapshot = await get(userRef)
+    let userData = {}
+
+    if (snapshot.exists()) {
+      userData = snapshot.val()
+      userData.uid = userCredential.user.uid
+    } else {
+      // fallback minimal data
+      userData = { email: signedInEmail }
+    }
+
+    // ✅ Save to localStorage
+    localStorage.setItem('user', JSON.stringify(userData))
+
+    await Swal.fire({
+      title: 'Welcome Back',
       html: `
-        <h3 style="margin-bottom:5px;">Hello, <strong>${user.email}</strong></h3>
+        <h3 style="margin-bottom:5px;">Hello, <strong>${signedInEmail}</strong></h3>
         <p style="font-size:15px;">You have successfully logged in to <strong>DMA Styles</strong>.</p>
       `,
       icon: 'success',
@@ -469,18 +534,26 @@ async function loginUser() {
       background: '#ffffff',
       color: '#222',
       allowOutsideClick: false,
-    }).then(() => {
-      window.location.href = '/dashboard'
     })
+
+    // redirect after confirmation
+    window.location.href = '/dashboard'
   } catch (error) {
+    console.error('Login error:', error)
     let errorMessage = 'Login failed. Please check your credentials.'
 
+    // firebase auth error codes
     if (error.code === 'auth/user-not-found') {
       errorMessage = 'No account found with this email.'
     } else if (error.code === 'auth/wrong-password') {
       errorMessage = 'Incorrect password. Please try again.'
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Invalid email format.'
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Too many failed attempts. Try again later or reset your password.'
+    } else if (error.message) {
+      // fallback to firebase error message if present
+      errorMessage = error.message
     }
 
     Swal.fire({

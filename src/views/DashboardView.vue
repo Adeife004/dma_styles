@@ -260,7 +260,9 @@
               </div>
             </div>
           </div>
-          <button class="btn-secondary" @click="router.push('/profile')">Edit Profile</button>
+          <button class="btn-secondary" @click="router.push('/completeprofile')">
+            Edit Profile
+          </button>
         </div>
       </section>
     </main>
@@ -351,6 +353,7 @@ const notifications = ref([
   },
 ])
 
+// User initials for avatar
 const userInitials = computed(() => {
   if (!userName.value || userName.value === 'User') return 'U'
   const names = userName.value.split(' ')
@@ -360,6 +363,7 @@ const userInitials = computed(() => {
   return userName.value[0].toUpperCase()
 })
 
+// Fetch user data
 onMounted(() => {
   AOS.init({
     duration: 1000,
@@ -367,6 +371,7 @@ onMounted(() => {
     once: true,
   })
 
+  // Fetch user data
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       userEmail.value = user.email
@@ -400,6 +405,7 @@ onMounted(() => {
   })
 })
 
+// Logout function
 async function logoutUser() {
   const result = await Swal.fire({
     title: 'Logout Confirmation',
@@ -415,16 +421,33 @@ async function logoutUser() {
   })
 
   if (result.isConfirmed) {
-    await signOut(auth)
-    Swal.fire({
-      title: 'Logged Out',
-      text: 'You have been successfully logged out.',
-      icon: 'success',
-      confirmButtonColor: '#000000',
-      timer: 1500,
-      showConfirmButton: false,
-    })
-    router.push('/')
+    try {
+      // Sign out from Firebase (if you're using it)
+      await signOut(auth)
+
+      //  Remove user data from localStorage
+      localStorage.removeItem('user')
+
+      await Swal.fire({
+        title: 'Logged Out',
+        text: 'You have been successfully logged out.',
+        icon: 'success',
+        confirmButtonColor: '#000000',
+        timer: 1500,
+        showConfirmButton: false,
+      })
+
+      // Redirect to home (or login page)
+      router.push('/home')
+    } catch (error) {
+      console.error('Logout error:', error)
+      Swal.fire({
+        title: 'Error',
+        text: 'Something went wrong while logging out.',
+        icon: 'error',
+        confirmButtonColor: '#000000',
+      })
+    }
   }
 }
 </script>

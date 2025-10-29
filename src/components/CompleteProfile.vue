@@ -80,6 +80,7 @@ import { auth, db } from '../firebase'
 import { ref as dbRef, set, get } from 'firebase/database'
 import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const router = useRouter()
 const isLoaded = ref(false)
@@ -91,58 +92,54 @@ const address = ref('')
 const userName = ref('')
 const userInitial = ref('U')
 
-onMounted(async () => {
-  const user = auth.currentUser
-
-  if (!user) {
-    router.push('/auth')
-    return
-  }
-
-  // Check if profile is already complete
-  const userRef = dbRef(db, `users/${user.uid}`)
-  const snapshot = await get(userRef)
-
-  if (snapshot.exists()) {
-    const userData = snapshot.val()
-    if (userData.phoneNumber && userData.address) {
-      // Profile already complete, redirect to dashboard
-      router.push('/dashboard')
+onMounted(() => {
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      router.push('/auth')
       return
     }
-  }
 
-  // Pre-fill available data from Google/Facebook
-  userName.value = user.displayName || 'User'
-  userInitial.value = userName.value.charAt(0).toUpperCase()
+    // Check if profile already complete
+    const userRef = dbRef(db, `users/${user.uid}`)
+    const snapshot = await get(userRef)
 
-  // Try to split display name into first and last name
-  if (user.displayName) {
-    const nameParts = user.displayName.split(' ')
-    firstName.value = nameParts[0] || ''
-    lastName.value = nameParts.slice(1).join(' ') || ''
-  }
+    if (snapshot.exists()) {
+      const userData = snapshot.val()
+      if (userData.phoneNumber && userData.address) {
+        router.push('/dashboard')
+        return
+      }
+    }
 
-  isLoaded.value = true
+    // Pre-fill Google info
+    userName.value = user.displayName || 'User'
+    userInitial.value = userName.value.charAt(0).toUpperCase()
+
+    if (user.displayName) {
+      const parts = user.displayName.split(' ')
+      firstName.value = parts[0] || ''
+      lastName.value = parts.slice(1).join(' ') || ''
+    }
+
+    isLoaded.value = true
+  })
 })
 
 async function completeProfile() {
   loading.value = true
   try {
     const user = auth.currentUser
-
     if (!user) {
       Swal.fire({
         icon: 'error',
         title: 'Authentication Error',
         text: 'User not authenticated. Please sign in again.',
-        confirmButtonColor: '#000000',
+        confirmButtonColor: '#000',
       })
       router.push('/auth')
       return
     }
 
-    // Save complete profile to database
     const userRef = dbRef(db, `users/${user.uid}`)
     await set(userRef, {
       firstName: firstName.value,
@@ -156,16 +153,13 @@ async function completeProfile() {
 
     Swal.fire({
       icon: 'success',
-      title: 'Profile Completed! 🎉',
+      title: 'Profile Completed!',
       html: `
-        <p style="font-size:15px;">Your profile has been saved successfully.</p>
+        <p>Your profile has been saved successfully.</p>
         <p>Welcome to <strong>DMA Styles</strong>!</p>
       `,
-      showConfirmButton: true,
       confirmButtonText: 'Go to Dashboard',
-      confirmButtonColor: '#000000',
-      background: '#ffffff',
-      color: '#222',
+      confirmButtonColor: '#000',
       allowOutsideClick: false,
     }).then(() => {
       router.push('/dashboard')
@@ -176,7 +170,7 @@ async function completeProfile() {
       icon: 'error',
       title: 'Save Failed',
       text: error.message,
-      confirmButtonColor: '#000000',
+      confirmButtonColor: '#000',
     })
   } finally {
     loading.value = false
