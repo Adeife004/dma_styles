@@ -1,237 +1,288 @@
 <template>
-  <header class="navbar">
+  <header class="navbar" :class="{ scrolled: isScrolled }">
     <div class="navbar-container">
-      <!-- LOGO -->
-      <router-link to="/" class="logo">
-        <img src="../assets/logo.png" alt="DMA Styles Logo" />
+      <!-- Logo -->
+      <router-link to="/" class="logo" @click="closeMenu">
+        <img src="../assets/logo.png" alt="DMA Styles" />
       </router-link>
 
-      <!-- HAMBURGER ICON -->
-      <button class="menu-toggle" @click="toggleMenu">
-        <span :class="{ open: isMenuOpen }"></span>
-        <span :class="{ open: isMenuOpen }"></span>
-        <span :class="{ open: isMenuOpen }"></span>
-      </button>
-
-      <!-- NAV LINKS -->
-      <nav :class="['nav-links', { open: isMenuOpen }]">
-        <!-- Scroll Links (same page sections) -->
-        <a href="#home" @click="scrollToSection('home')">Home</a>
-        <a href="#about" @click="scrollToSection('about')">About</a>
-        <a href="#testimonials" @click="scrollToSection('testimonials')">Testimonials</a>
-        <a href="#contact" @click="scrollToSection('contact')">Contact</a>
-
-        <!-- Router Links (navigate to other pages) -->
-        <router-link to="/services" exact-active-class="active" @click="closeMenu"
-          >Services</router-link
-        >
-        <router-link to="/dashboard" exact-active-class="active" @click="closeMenu"
-          >Dashboard</router-link
-        >
-
-        <!-- AUTH BUTTONS (mobile view inside menu) -->
-        <div class="auth-buttons mobile">
-          <router-link
-            :to="{ path: '/auth', query: { mode: 'login' } }"
-            class="btn login"
-            @click="closeMenu"
-            >Login</router-link
-          >
-          <router-link
-            :to="{ path: '/auth', query: { mode: 'signup' } }"
-            class="btn signup"
-            @click="closeMenu"
-            >Sign Up</router-link
-          >
-        </div>
+      <!-- Desktop Navigation -->
+      <nav class="desktop-nav">
+        <a href="#home" @click.prevent="scrollToSection('home')">Home</a>
+        <a href="#about" @click.prevent="scrollToSection('about')">About</a>
+        <a href="#testimonials" @click.prevent="scrollToSection('testimonials')">Testimonials</a>
+        <a href="#contact" @click.prevent="scrollToSection('contact')">Contact</a>
+        <router-link to="/services" @click="closeMenu">Services</router-link>
+        <router-link to="/dashboard" @click="closeMenu">Dashboard</router-link>
       </nav>
 
-      <!-- AUTH BUTTONS (desktop only) -->
-      <div class="auth-buttons desktop">
-        <router-link :to="{ path: '/auth', query: { mode: 'login' } }" class="btn login"
-          >Login</router-link
-        >
-        <router-link :to="{ path: '/auth', query: { mode: 'signup' } }" class="btn signup"
-          >Sign Up</router-link
-        >
+      <!-- Desktop Auth Buttons -->
+      <div class="auth-buttons desktop-auth">
+        <router-link :to="{ path: '/auth', query: { mode: 'login' } }" class="btn-login">
+          Login
+        </router-link>
+        <router-link :to="{ path: '/auth', query: { mode: 'signup' } }" class="btn-signup">
+          Sign Up
+        </router-link>
       </div>
+
+      <!-- Hamburger Menu -->
+      <button class="hamburger" :class="{ active: isMenuOpen }" @click="toggleMenu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
 
-    <!-- OVERLAY -->
-    <div v-if="isMenuOpen" class="overlay" @click="closeMenu"></div>
+    <!-- Mobile Menu -->
+    <transition name="slide">
+      <div v-if="isMenuOpen" class="mobile-menu">
+        <nav class="mobile-nav">
+          <a href="#home" @click.prevent="handleMobileClick('home')">Home</a>
+          <a href="#about" @click.prevent="handleMobileClick('about')">About</a>
+          <a href="#testimonials" @click.prevent="handleMobileClick('testimonials')">
+            Testimonials
+          </a>
+          <a href="#contact" @click.prevent="handleMobileClick('contact')">Contact</a>
+          <router-link to="/services" @click="closeMenu">Services</router-link>
+          <router-link to="/dashboard" @click="closeMenu">Dashboard</router-link>
+        </nav>
+
+        <div class="mobile-auth">
+          <router-link
+            :to="{ path: '/auth', query: { mode: 'login' } }"
+            class="btn-login"
+            @click="closeMenu"
+          >
+            Login
+          </router-link>
+          <router-link
+            :to="{ path: '/auth', query: { mode: 'signup' } }"
+            class="btn-signup"
+            @click="closeMenu"
+          >
+            Sign Up
+          </router-link>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Overlay -->
+    <transition name="fade">
+      <div v-if="isMenuOpen" class="overlay" @click="closeMenu"></div>
+    </transition>
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router' // Add this import
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter() // Initialize router
+const router = useRouter()
 const isMenuOpen = ref(false)
+const isScrolled = ref(false)
 
-const toggleMenu = () => (isMenuOpen.value = !isMenuOpen.value)
-const closeMenu = () => (isMenuOpen.value = false)
+// Toggle mobile menu
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value
+  document.body.style.overflow = isMenuOpen.value ? 'hidden' : ''
+}
 
-function scrollToSection(id) {
-  // close menu on mobile
-  closeMenu()
+// Close mobile menu
+const closeMenu = () => {
+  isMenuOpen.value = false
+  document.body.style.overflow = ''
+}
 
-  // if not already on home page, go there first, then scroll
+// Scroll to section
+const scrollToSection = (id) => {
   if (router.currentRoute.value.path !== '/') {
     router.push('/').then(() => {
       setTimeout(() => {
-        const section = document.getElementById(id)
-        if (section) section.scrollIntoView({ behavior: 'smooth' })
+        const element = document.getElementById(id)
+        if (element) element.scrollIntoView({ behavior: 'smooth' })
       }, 300)
     })
   } else {
-    const section = document.getElementById(id)
-    if (section) section.scrollIntoView({ behavior: 'smooth' })
+    const element = document.getElementById(id)
+    if (element) element.scrollIntoView({ behavior: 'smooth' })
   }
 }
+
+// Handle mobile menu clicks
+const handleMobileClick = (id) => {
+  closeMenu()
+  setTimeout(() => scrollToSection(id), 300)
+}
+
+// Detect scroll
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+  document.body.style.overflow = ''
+})
 </script>
 
 <style scoped>
+/* ============================================
+   NAVBAR BASE
+============================================ */
 .navbar {
-  background: rgba(13, 13, 13, 0.9);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  color: #fff;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
-  width: 100%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
   transition: all 0.4s ease;
 }
 
-/* ✨ Optional shimmer reflection when scrolling */
 .navbar.scrolled {
-  background: rgba(13, 13, 13, 0.85);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(16px);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(25px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 12px 25px;
+  padding: 16px 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  text-align: center;
 }
 
-/* LOGO */
-.logo img {
-  width: 75px;
-  height: 75px;
-  object-fit: cover;
-}
-
-/* NAV LINKS */
-.nav-links {
-  display: flex;
-  gap: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.nav-links a {
-  position: relative;
-  text-decoration: none;
-  color: #ccc;
-  font-weight: 500;
-  font-size: 1rem;
-  padding: 6px 10px;
-  transition: transform 0.3s ease;
-  overflow: hidden;
-}
-
-/* Animated gold hover effect */
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 255, 255, 0));
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.4s ease;
-  z-index: -1;
-}
-
-.nav-links a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-
-.nav-links a:hover {
-  color: #ffd700;
-  transform: translateY(-3px);
-  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-}
-
-/* Active link */
-.nav-links .active {
-  color: #ffd700;
-}
-
-/* AUTH BUTTONS */
-.auth-buttons {
-  display: flex;
-  gap: 0.8rem;
-}
-
-.auth-buttons.mobile {
-  display: none;
-}
-
-.btn {
-  padding: 6px 15px;
-  border-radius: 8px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.btn.login {
-  background: transparent;
-  color: #ffd700;
-  border: 1px solid #ffd700;
-}
-
-.btn.login:hover {
-  background: #ffd700;
-  color: #000;
-  transform: scale(1.05);
-}
-
-.btn.signup {
-  background: #ffd700;
-  color: #000;
-}
-
-.btn.signup:hover {
-  background: transparent;
-  color: #ffd700;
-  border: 1px solid #ffd700;
-  transform: scale(1.05);
-}
-
-/* ========== HAMBURGER BUTTON ========== */
-.menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  width: 28px;
-  height: 22px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  gap: 5px;
+/* ============================================
+   LOGO
+============================================ */
+.logo {
   z-index: 1100;
 }
 
-.menu-toggle span {
+.logo img {
+  height: 70px;
+  width: auto;
+  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
+  transition: all 0.3s ease;
+}
+
+.logo:hover img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+}
+
+/* ============================================
+   DESKTOP NAVIGATION
+============================================ */
+.desktop-nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.desktop-nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.desktop-nav a::before {
+  content: '';
+  position: absolute;
+  inset: -8px -12px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.desktop-nav a:hover::before,
+.desktop-nav a.router-link-active::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.desktop-nav a:hover,
+.desktop-nav a.router-link-active {
+  color: #ffd700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* ============================================
+   AUTH BUTTONS
+============================================ */
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-login,
+.btn-signup {
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-login {
+  color: #ffd700;
+  border: 2px solid #ffd700;
+  background: transparent;
+}
+
+.btn-login:hover {
+  background: rgba(255, 215, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-signup {
+  color: #000;
+  background: #ffd700;
+  border: 2px solid #ffd700;
+}
+
+.btn-signup:hover {
+  background: #ffed4e;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* ============================================
+   HAMBURGER MENU
+============================================ */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+.hamburger span {
   width: 100%;
   height: 3px;
   background: #ffd700;
@@ -239,107 +290,137 @@ function scrollToSection(id) {
   transition: all 0.4s ease;
 }
 
-.menu-toggle span.open:nth-child(1) {
-  transform: rotate(45deg) translateY(8px);
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
 }
 
-.menu-toggle span.open:nth-child(2) {
+.hamburger.active span:nth-child(2) {
   opacity: 0;
 }
 
-.menu-toggle span.open:nth-child(3) {
-  transform: rotate(-45deg) translateY(-8px);
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(8px, -8px);
 }
 
-/* RESPONSIVE DESIGN */
+/* ============================================
+   MOBILE MENU
+============================================ */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 85%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border-left: 1px solid rgba(255, 215, 0, 0.2);
+  padding: 100px 30px 40px;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.mobile-nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav a {
+  color: #e0e0e0;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.mobile-nav a:hover,
+.mobile-nav a.router-link-active {
+  color: #ffd700;
+  transform: translateX(10px);
+}
+
+.mobile-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.mobile-auth .btn-login,
+.mobile-auth .btn-signup {
+  width: 100%;
+  text-align: center;
+}
+
+/* ============================================
+   OVERLAY
+============================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 999;
+}
+
+/* ============================================
+   TRANSITIONS
+============================================ */
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.4s ease;
+}
+
+.slide-enter-from {
+  transform: translateX(100%);
+}
+
+.slide-leave-to {
+  transform: translateX(100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+============================================ */
 @media (max-width: 1024px) {
-  .menu-toggle {
-    display: flex;
-  }
-
-  .nav-links {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 6rem 2rem;
-    gap: 1.5rem;
-    z-index: 1000;
-    transition: right 0.4s ease;
-  }
-
-  .nav-links.open {
-    right: 0;
-  }
-
-  .auth-buttons.desktop {
+  .desktop-nav,
+  .desktop-auth {
     display: none;
   }
 
-  .auth-buttons.mobile {
+  .hamburger {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-container {
+    padding: 12px 20px;
   }
 
-  .overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-    height: 100vh;
-    z-index: 900;
-    overflow: hidden;
-    animation: fadeIn 0.5s ease forwards;
+  .logo img {
+    height: 60px;
   }
 
-  /* Add a shimmer reflection layer */
-  .overlay::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -150%;
-    width: 150%;
-    height: 100%;
-    background: linear-gradient(
-      120deg,
-      transparent 20%,
-      rgba(255, 255, 255, 0.2) 40%,
-      rgba(255, 255, 255, 0.4) 50%,
-      rgba(255, 255, 255, 0.2) 60%,
-      transparent 80%
-    );
-    animation: shimmer 5s linear infinite;
-  }
-
-  /* Smooth fade-in animation */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(1.02);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* Light shimmer animation */
-  @keyframes shimmer {
-    0% {
-      left: -150%;
-    }
-
-    100% {
-      left: 150%;
-    }
+  .mobile-menu {
+    width: 100%;
+    max-width: 100%;
   }
 }
 </style>

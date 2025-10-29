@@ -36,8 +36,9 @@ function scrollToSection(sectionId) {
 
 <style scoped>
 .hero {
+  padding-top: 80px;
   position: relative;
-  height: 100vh;
+  height: 120vh;
   display: flex;
   align-items: center;
   justify-content: center;

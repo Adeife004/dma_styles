@@ -1,14 +1,5 @@
 <script setup>
 import { RouterView } from 'vue-router'
-
-window.addEventListener('scroll', () => {
-  const navbar = document.querySelector('.navbar')
-  if (window.scrollY > 50) {
-    navbar.classList.add('scrolled')
-  } else {
-    navbar.classList.remove('scrolled')
-  }
-})
 </script>
 
 <template>
@@ -19,11 +10,18 @@ window.addEventListener('scroll', () => {
   </router-view>
 </template>
 
-<style scoped>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.8s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
