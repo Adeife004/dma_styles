@@ -76,7 +76,7 @@ onMounted(() => {
 
 // Navigate ONLY after the fade transition completes
 function onTransitionComplete() {
-  router.push('/auth')
+  router.push('/home')
 }
 </script>
 

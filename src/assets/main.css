@@ -1,3 +1,7 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+/* global reset */
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +9,34 @@
   scroll-behavior: smooth;
 }
 
-body {
-  background-color: #0d0d0d;
+/* Apply fonts */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Playfair Display', serif;
+}
+
+body,
+p,
+a,
+button,
+input,
+textarea,
+select {
   font-family: 'Poppins', sans-serif;
+}
+
+h1 {
+  font-weight: 700;
+}
+
+p {
+  font-weight: 400;
+}
+
+.light-text {
+  font-weight: 300;
 }
