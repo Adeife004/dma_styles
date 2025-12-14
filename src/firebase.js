@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyB7pP55qYm02DH4oVuWND23E-b52WHgxpg",
+    apiKey: import.meta.env.DMAAPIKEYS,
     authDomain: "dma-styles.firebaseapp.com",
     databaseURL: "https://dma-styles-default-rtdb.firebaseio.com",
     projectId: "dma-styles",
