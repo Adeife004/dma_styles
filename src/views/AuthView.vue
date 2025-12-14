@@ -44,7 +44,9 @@
             <a href="#" id="googleBtn" @click.prevent="googleSignIn">
               <i class="fab fa-google"></i>
             </a>
-            <a href="#"><i class="fab fa-apple"></i></a>
+            <a href="#" @click.prevent="appleSignIn">
+              <i class="fab fa-apple"></i>
+            </a>
           </div>
 
           <p class="divider" data-aos="fade-up" data-aos-delay="400"><span>or</span></p>
@@ -99,7 +101,9 @@
             <a href="#" id="googleBtn" @click.prevent="googleSignIn">
               <i class="fab fa-google"></i>
             </a>
-            <a href="#"><i class="fab fa-apple"></i></a>
+            <a href="#" @click.prevent="appleSignIn">
+              <i class="fab fa-apple"></i>
+            </a>
           </div>
 
           <p class="divider"><span>or</span></p>
@@ -140,10 +144,6 @@
               </div>
             </div>
           </div>
-
-          <!-- <label data-aos="fade-right" data-aos-delay="500" for="fullName">Full Name</label>
-          <input data-aos="fade-left" data-aos-delay="600" id="fullName" type="text" v-model="fname"
-            placeholder="Enter your full name" required /> -->
 
           <!-- Email + Phone -->
           <div class="form-row">
@@ -269,6 +269,7 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   FacebookAuthProvider,
+  OAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
 } from 'firebase/auth'
@@ -294,6 +295,7 @@ const showSignup = ref(false)
 // Providers
 const googleProvider = new GoogleAuthProvider()
 const facebookProvider = new FacebookAuthProvider()
+const appleProvider = new OAuthProvider('apple.com')
 
 // Loader & Toast
 const loading = ref(false)
@@ -367,6 +369,46 @@ function resetFields() {
   loginPassword.value = ''
 }
 
+// Helper function to save user data and redirect to dashboard
+async function handleSuccessfulAuth(user, displayName = null) {
+  try {
+    // Fetch user data from Firebase Realtime DB
+    const userRef = dbRef(db, `users/${user.uid}`)
+    const snapshot = await get(userRef)
+    let userData = {}
+
+    if (snapshot.exists()) {
+      userData = snapshot.val()
+      userData.uid = user.uid
+    } else {
+      // Create minimal user data for new social sign-in users
+      const name = displayName || user.displayName || 'User'
+      const [firstName = '', lastName = ''] = name.split(' ')
+
+      userData = {
+        uid: user.uid,
+        email: user.email,
+        firstName: firstName,
+        lastName: lastName,
+        displayName: name,
+        photoURL: user.photoURL || '',
+        createdAt: new Date().toISOString(),
+      }
+
+      // Save to database
+      await set(userRef, userData)
+    }
+
+    // Save to localStorage
+    localStorage.setItem('user', JSON.stringify(userData))
+
+    return userData
+  } catch (error) {
+    console.error('Error handling successful auth:', error)
+    throw error
+  }
+}
+
 // SignUp User & Save to Realtime Database
 async function signupUser() {
   loading.value = true
@@ -379,12 +421,6 @@ async function signupUser() {
         confirmButtonColor: '#000000',
         background: '#f9f9f9',
         color: '#333',
-        backdrop: `
-          rgba(0,0,0,0.4)
-          url("../assets/logo.jpg")
-          left top
-          no-repeat
-        `,
       })
       loading.value = false
       return
@@ -398,12 +434,6 @@ async function signupUser() {
         confirmButtonColor: '#000000',
         background: '#f9f9f9',
         color: '#333',
-        backdrop: `
-          rgba(0,0,0,0.4)
-          url("../assets/logo.jpg")
-          right top
-          no-repeat
-        `,
       })
       loading.value = false
       return
@@ -428,7 +458,7 @@ async function signupUser() {
       createdAt: new Date().toISOString(),
     })
 
-    // ✅ Store user in localStorage
+    // Store user in localStorage
     const userData = {
       uid: user.uid,
       firstName: fname.value,
@@ -448,7 +478,6 @@ async function signupUser() {
         <p style="font-size:15px;">Your account has been created successfully.</p>
         <p>Please sign in to continue to <strong>DMA Styles</strong>.</p>
       `,
-      icon: 'success',
       showConfirmButton: true,
       confirmButtonText: 'Go to Sign In',
       confirmButtonColor: '#000000',
@@ -495,54 +524,61 @@ async function loginUser() {
       return
     }
 
-    // Debugging: show values (remove in production)
-    console.log('Attempting sign in with:', { email, passwordLength: password.length })
-
+    // Sign in user
     const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    const user = userCredential.user
 
-    // Debugging: confirm returned user
-    console.log('Signed in userCredential:', userCredential)
+    // Try to fetch user data with timeout
+    let userData = { uid: user.uid, email: user.email }
 
-    const signedInEmail = userCredential.user?.email ?? email
+    try {
+      // Set a timeout for database read
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Database timeout')), 5000),
+      )
 
-    // ✅ Fetch user data from Firebase Realtime DB and store locally
-    const userRef = dbRef(db, `users/${userCredential.user.uid}`)
-    const snapshot = await get(userRef)
-    let userData = {}
+      const dbPromise = (async () => {
+        const userRef = dbRef(db, `users/${user.uid}`)
+        const snapshot = await get(userRef)
 
-    if (snapshot.exists()) {
-      userData = snapshot.val()
-      userData.uid = userCredential.user.uid
-    } else {
-      // fallback minimal data
-      userData = { email: signedInEmail }
+        if (snapshot.exists()) {
+          return { ...snapshot.val(), uid: user.uid }
+        }
+        return userData
+      })()
+
+      userData = await Promise.race([dbPromise, timeoutPromise])
+    } catch (dbError) {
+      console.error('Database read error:', dbError)
+      // Continue with basic user data
     }
 
-    // ✅ Save to localStorage
+    // Save to localStorage
     localStorage.setItem('user', JSON.stringify(userData))
 
-    await Swal.fire({
+    // Show success message
+    Swal.fire({
       title: 'Welcome Back',
       html: `
-        <h3 style="margin-bottom:5px;">Hello, <strong>${signedInEmail}</strong></h3>
+        <h3 style="margin-bottom:5px;">Hello, <strong>${userData.firstName || email}</strong></h3>
         <p style="font-size:15px;">You have successfully logged in to <strong>DMA Styles</strong>.</p>
       `,
       icon: 'success',
-      showConfirmButton: true,
       confirmButtonText: 'Go to Dashboard',
       confirmButtonColor: '#000000',
       background: '#ffffff',
       color: '#222',
       allowOutsideClick: false,
+      timer: 2000,
+      timerProgressBar: true,
+    }).then(() => {
+      // Force redirect
+      window.location.href = '/dashboard'
     })
-
-    // redirect after confirmation
-    window.location.href = '/dashboard'
   } catch (error) {
     console.error('Login error:', error)
     let errorMessage = 'Login failed. Please check your credentials.'
 
-    // firebase auth error codes
     if (error.code === 'auth/user-not-found') {
       errorMessage = 'No account found with this email.'
     } else if (error.code === 'auth/wrong-password') {
@@ -550,15 +586,12 @@ async function loginUser() {
     } else if (error.code === 'auth/invalid-email') {
       errorMessage = 'Invalid email format.'
     } else if (error.code === 'auth/too-many-requests') {
-      errorMessage = 'Too many failed attempts. Try again later or reset your password.'
-    } else if (error.message) {
-      // fallback to firebase error message if present
-      errorMessage = error.message
+      errorMessage = 'Too many failed attempts. Try again later.'
     }
 
     Swal.fire({
       icon: 'error',
-      title: 'Login Error 🚫',
+      title: 'Login Error',
       text: errorMessage,
       confirmButtonColor: '#000000',
       background: '#f9f9f9',
@@ -569,75 +602,40 @@ async function loginUser() {
   }
 }
 
-// Google Sign-In with profile completion check
+// Google
 async function googleSignIn() {
   loading.value = true
   try {
     const result = await signInWithPopup(auth, googleProvider)
     const user = result.user
 
-    // Check if user profile is complete in database
-    const userRef = dbRef(db, `users/${user.uid}`)
-    const snapshot = await get(userRef)
-
-    if (snapshot.exists()) {
-      const userData = snapshot.val()
-      // Check if phone and address exist
-      if (userData.phoneNumber && userData.address) {
-        // Profile complete, go to dashboard
-        Swal.fire({
-          title: 'Welcome Back!',
-          html: `
-            <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
-            <p style="font-size:15px;">Successfully signed in via Google.</p>
-          `,
-          icon: 'success',
-          showConfirmButton: true,
-          confirmButtonText: 'Go to Dashboard',
-          confirmButtonColor: '#000000',
-          background: '#ffffff',
-          color: '#222',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.location.href = '/dashboard'
-        })
-      } else {
-        // Profile incomplete, go to complete profile
-        Swal.fire({
-          title: 'Complete Your Profile',
-          html: `
-            <p style="font-size:15px;">Please provide additional information to continue.</p>
-          `,
-          icon: 'info',
-          showConfirmButton: true,
-          confirmButtonText: 'Continue',
-          confirmButtonColor: '#000000',
-          background: '#ffffff',
-          color: '#222',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.location.href = '/complete-profile'
-        })
-      }
-    } else {
-      // New user, go to complete profile
-      Swal.fire({
-        title: `Welcome to DMA Styles!`,
-        html: `
-          <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
-          <p style="font-size:15px;">Let's complete your profile to get started.</p>
-        `,
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonText: 'Complete Profile',
-        confirmButtonColor: '#000000',
-        background: '#ffffff',
-        color: '#222',
-        allowOutsideClick: false,
-      }).then(() => {
-        window.location.href = '/complete-profile'
-      })
+    // Save minimal user data
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
     }
+    localStorage.setItem('user', JSON.stringify(userData))
+
+    // Try to save to database (don't wait for it)
+    const userRef = dbRef(db, `users/${user.uid}`)
+    set(userRef, {
+      ...userData,
+      createdAt: new Date().toISOString(),
+    }).catch((err) => console.error('DB save error:', err))
+
+    // Show success and redirect immediately
+    Swal.fire({
+      title: 'Welcome!',
+      html: `<h3>Hello, <strong>${user.displayName || 'User'}</strong></h3>`,
+      icon: 'success',
+      confirmButtonColor: '#000000',
+      timer: 1500,
+      showConfirmButton: false,
+    }).then(() => {
+      window.location.href = '/dashboard'
+    })
   } catch (error) {
     console.error('Google Sign-In error:', error)
     Swal.fire({
@@ -645,79 +643,44 @@ async function googleSignIn() {
       title: 'Sign-In Failed',
       text: 'Google Sign-In failed: ' + error.message,
       confirmButtonColor: '#000000',
-      background: '#f9f9f9',
-      color: '#333',
     })
   } finally {
     loading.value = false
   }
 }
 
-// Facebook Sign-In with profile completion check
+// Facebook
 async function facebookSignIn() {
   loading.value = true
   try {
     const result = await signInWithPopup(auth, facebookProvider)
     const user = result.user
 
-    // Check if user profile is complete
-    const userRef = dbRef(db, `users/${user.uid}`)
-    const snapshot = await get(userRef)
-
-    if (snapshot.exists()) {
-      const userData = snapshot.val()
-      if (userData.phoneNumber && userData.address) {
-        Swal.fire({
-          title: 'Welcome Back!',
-          html: `
-            <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
-            <p style="font-size:15px;">Successfully signed in via Facebook.</p>
-          `,
-          icon: 'success',
-          showConfirmButton: true,
-          confirmButtonText: 'Go to Dashboard',
-          confirmButtonColor: '#000000',
-          background: '#ffffff',
-          color: '#222',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.location.href = '/dashboard'
-        })
-      } else {
-        Swal.fire({
-          title: 'Complete Your Profile',
-          html: `
-            <p style="font-size:15px;">Please provide additional information to continue.</p>
-          `,
-          icon: 'info',
-          showConfirmButton: true,
-          confirmButtonText: 'Continue',
-          confirmButtonColor: '#000000',
-          background: '#ffffff',
-          color: '#222',
-          allowOutsideClick: false,
-        }).then(() => {
-          window.location.href = '/complete-profile'
-        })
-      }
-    } else {
-      Swal.fire({
-        title: `Welcome to DMA Styles!`,
-        html: `
-          <h3 style="margin-bottom:5px;">Hello, <strong>${user.displayName || 'User'}</strong></h3>
-          <p style="font-size:15px;">Let's complete your profile to get started.</p>
-        `,
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonText: 'Complete Profile',
-        confirmButtonColor: '#000000',
-        background: '#ffffff',
-        color: '#222',
-        allowOutsideClick: false,
-      }).then(() => {
-        window.location.href = '/complete-profile'
-      })
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL,
     }
+    localStorage.setItem('user', JSON.stringify(userData))
+
+    // Save to DB without waiting
+    const userRef = dbRef(db, `users/${user.uid}`)
+    set(userRef, {
+      ...userData,
+      createdAt: new Date().toISOString(),
+    }).catch((err) => console.error('DB save error:', err))
+
+    Swal.fire({
+      title: 'Welcome!',
+      html: `<h3>Hello, <strong>${user.displayName || 'User'}</strong></h3>`,
+      icon: 'success',
+      confirmButtonColor: '#000000',
+      timer: 1500,
+      showConfirmButton: false,
+    }).then(() => {
+      window.location.href = '/dashboard'
+    })
   } catch (error) {
     console.error('Facebook Sign-In error:', error)
     Swal.fire({
@@ -725,8 +688,51 @@ async function facebookSignIn() {
       title: 'Sign-In Failed',
       text: 'Facebook Sign-In failed: ' + error.message,
       confirmButtonColor: '#000000',
-      background: '#f9f9f9',
-      color: '#333',
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+// Apple
+async function appleSignIn() {
+  loading.value = true
+  try {
+    const result = await signInWithPopup(auth, appleProvider)
+    const user = result.user
+
+    const userData = {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName || user.email,
+      photoURL: user.photoURL,
+    }
+    localStorage.setItem('user', JSON.stringify(userData))
+
+    // Save to DB without waiting
+    const userRef = dbRef(db, `users/${user.uid}`)
+    set(userRef, {
+      ...userData,
+      createdAt: new Date().toISOString(),
+    }).catch((err) => console.error('DB save error:', err))
+
+    Swal.fire({
+      title: 'Welcome!',
+      html: `<h3>Hello, <strong>${user.displayName || user.email}</strong></h3>`,
+      icon: 'success',
+      confirmButtonColor: '#000000',
+      timer: 1500,
+      showConfirmButton: false,
+    }).then(() => {
+      window.location.href = '/dashboard'
+    })
+  } catch (error) {
+    console.error('Apple Sign-In error:', error)
+    Swal.fire({
+      icon: 'error',
+      title: 'Sign-In Failed',
+      text: 'Apple Sign-In failed: ' + error.message,
+      confirmButtonColor: '#000000',
     })
   } finally {
     loading.value = false
@@ -822,7 +828,7 @@ async function forgotPassword() {
   width: 1000px;
   height: 95vh;
   border-radius: 20px;
-  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 6px 25px rgba(var(--theme-color-rgb, 255, 215, 0), 0.6);
   overflow: hidden;
   position: relative;
   perspective: 1000px;
@@ -855,11 +861,11 @@ async function forgotPassword() {
 .app-logo {
   width: 120px;
   height: auto;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3));
+  filter: drop-shadow(0 0 10px rgba(var(--theme-color-rgb, 255, 215, 0), 0.5));
 }
 
 .panel-text h2 {
-  color: #ffd700;
+  color: var(--theme-color);
   margin-bottom: 1rem;
   font-size: 1.8rem;
 }
@@ -871,7 +877,7 @@ async function forgotPassword() {
 }
 
 .panel-btn {
-  background: #ffd700;
+  background: var(--theme-color);
   color: #000;
   border: none;
   padding: 10px 25px;
@@ -882,7 +888,7 @@ async function forgotPassword() {
 }
 
 .panel-btn:hover {
-  background: #917f16;
+  background: rgba(var(--theme-color-rgb, 255, 215, 0), 0.5);
   color: #f1f1f1;
 }
 
@@ -928,7 +934,7 @@ async function forgotPassword() {
 /* FORM ELEMENTS */
 .auth-face h2 {
   text-align: center;
-  color: #ffd700;
+  color: var(--theme-color);
   margin-bottom: 1rem;
 }
 
@@ -943,12 +949,12 @@ input {
   padding: 10px;
   border-radius: 8px;
   color: #fff;
-  font-size: 1rem;
+  font-size: 14px;
   transition: all 0.3s;
 }
 
 input:focus {
-  border-color: #ffd700;
+  border-color: var(--theme-color);
   outline: none;
 }
 
@@ -960,7 +966,7 @@ input:focus {
 }
 
 .btn {
-  background: #ffd700;
+  background: var(--theme-color);
   border: none;
   padding: 10px;
   color: #000;
@@ -972,7 +978,7 @@ input:focus {
 }
 
 .btn:hover {
-  background: #917f16;
+  background: rgba(var(--theme-color-rgb, 255, 215, 0), 0.1);
   color: #f1f1f1;
 }
 
@@ -984,14 +990,14 @@ input:focus {
 
 .social-container a {
   background: #333;
-  color: #ffd700;
+  color: var(--theme-color);
   border-radius: 50%;
   padding: 10px;
   transition: all 0.3s;
 }
 
 .social-container a:hover {
-  background: #ffd700;
+  background: var(--theme-color);
   color: #000;
 }
 
@@ -1044,7 +1050,7 @@ input {
 
 input:focus {
   border-color: #d4af37;
-  box-shadow: 0 0 6px #d4af37;
+  box-shadow: 0 6px 25px rgba(var(--theme-color-rgb, 255, 215, 0), 0.6);
 }
 
 .password-wrapper {
@@ -1080,8 +1086,8 @@ input:focus {
 }
 
 input:focus {
-  border-color: #d4af37;
-  box-shadow: 0 0 6px #d4af37;
+  border-color: 1px solid rgba(var(--theme-color-rgb, 255, 215, 0), 0.1);
+  box-shadow: 0 6px 25px rgba(var(--theme-color-rgb, 255, 215, 0), 0.6);
 }
 
 .forgot-password a {
@@ -1238,7 +1244,7 @@ input:focus {
 
 .loader {
   border: 5px solid #222;
-  border-top: 5px solid #ffd700;
+  border-top: 5px solid var(--theme-color);
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -1262,7 +1268,7 @@ input:focus {
   border-radius: 10px;
   font-weight: 500;
   z-index: 9999;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 25px rgba(var(--theme-color-rgb, 255, 215, 0), 0.6);
   animation: slideIn 0.4s ease;
 }
 
@@ -1275,7 +1281,7 @@ input:focus {
 }
 
 .toast.info {
-  border-left: 5px solid #ffd700;
+  border-left: 5px solid var(--theme-color);
 }
 
 @keyframes slideIn {

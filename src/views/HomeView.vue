@@ -5,6 +5,9 @@ import CollectionSection from '../components/CollectionSection.vue'
 import AboutSection from '../components/AboutSection.vue'
 import ServicesSection from '@/components/ServicesSection.vue'
 import ProcessSection from '@/components/ProcessSection.vue'
+import Testimonial from '@/components/Testimonial.vue'
+import Contact from '@/components/Contact.vue'
+import Footer from '@/components/Footer.vue'
 </script>
 
 <template>
@@ -13,7 +16,7 @@ import ProcessSection from '@/components/ProcessSection.vue'
     <Navbar />
 
     <!-- hero-section -->
-    <section class="home">
+    <section id="home">
       <HeroSection />
     </section>
 
@@ -23,12 +26,12 @@ import ProcessSection from '@/components/ProcessSection.vue'
     </section>
 
     <!-- About Section -->
-    <section class="about">
+    <section id="about">
       <AboutSection />
     </section>
 
     <!-- Services Section -->
-    <section class="services">
+    <section id="services">
       <ServicesSection />
     </section>
 
@@ -36,6 +39,19 @@ import ProcessSection from '@/components/ProcessSection.vue'
     <section class="process">
       <ProcessSection />
     </section>
+
+    <!-- Testimonial -->
+    <section id="testimonials" class="testimonials">
+      <Testimonial />
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+      <Contact />
+    </section>
+
+    <!-- footer -->
+    <Footer />
   </main>
 </template>
 

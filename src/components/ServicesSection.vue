@@ -24,7 +24,7 @@
           <div class="card-inner">
             <!-- Icon -->
             <div class="service-icon">
-              <span class="icon">{{ service.icon }}</span>
+              <i :class="service.icon"></i>
             </div>
 
             <!-- Content -->
@@ -46,7 +46,7 @@
             </div>
 
             <!-- CTA Button -->
-            <button class="btn-service">Book Now</button>
+            <button class="btn-service" @click="bookService(service.title)">Book Now</button>
           </div>
 
           <!-- Decorative Elements -->
@@ -59,9 +59,9 @@
         <div class="cta-content">
           <h3 class="cta-title">Not Sure Which Service You Need?</h3>
           <p class="cta-text">
-            Schedule a free consultation and let us help you find the perfect solution
+            Schedule a consultation and let us help you find the perfect solution
           </p>
-          <button class="btn-consultation">Book Free Consultation</button>
+          <button class="btn-consultation" @click="bookConsultation">Book Consultation</button>
         </div>
       </div>
     </div>
@@ -74,12 +74,15 @@
 
 <script setup>
 import { ref } from 'vue'
+import Swal from 'sweetalert2'
 
 const hoveredIndex = ref(null)
 
+const WHATSAPP_NUMBER = '2348160763959'
+
 const services = ref([
   {
-    icon: '👔',
+    icon: 'fas fa-user-tie',
     title: 'Custom Tailoring',
     description:
       'Bespoke clothing designed and tailored to your exact measurements and preferences',
@@ -92,9 +95,10 @@ const services = ref([
     price: '₦50,000',
   },
   {
-    icon: '💍',
+    icon: 'fas fa-ring',
     title: 'Bridal & Wedding',
-    description: 'Stunning wedding attire for your special day, from bridal gowns to groomswear',
+    description:
+      'Stunning wedding attire for your special day, from bridal gowns to bridesmaid wears',
     features: [
       'Custom bridal gowns',
       'Bridesmaid dresses',
@@ -104,44 +108,220 @@ const services = ref([
     price: '₦150,000',
   },
   {
-    icon: '✨',
+    icon: 'fas fa-briefcase',
     title: 'Formal Wear',
-    description: 'Elegant formal attire for corporate events, galas, and special occasions',
-    features: [
-      'Business suits',
-      'Evening gowns',
-      'Tuxedos & dinner jackets',
-      'Professional styling advice',
-    ],
+    description: 'Elegant formal outfits for corporate events, galas, and special occasions',
+    features: ['Business suits', 'Evening gowns', 'Blazers', 'Professional styling advice'],
     price: '₦60,000',
   },
   {
-    icon: '🎭',
+    icon: 'fas fa-masks-theater',
     title: 'Traditional Attire',
     description: 'Authentic traditional wear that honors culture while embracing modern style',
     features: [
       'Aso-ebi coordination',
-      'Agbada & Kaftan',
+      'Unique Bubu Styles',
       'Traditional gowns',
-      'Cultural accessories',
+      'Professional styling advice',
     ],
-    price: '₦40,000',
+    price: '₦150,000',
   },
   {
-    icon: '✂️',
+    icon: 'fas fa-cut',
     title: 'Alterations & Repairs',
     description: 'Expert alterations and repairs to restore or modify your existing garments',
     features: ['Hemming & resizing', 'Zipper replacement', 'Fabric repairs', 'Style modifications'],
-    price: '₦5,000',
+    price: '₦10,000',
   },
   {
-    icon: '🎨',
+    icon: 'fas fa-palette',
     title: 'Fashion Consultation',
     description: 'Personal styling sessions to help you discover and refine your unique style',
     features: ['Wardrobe analysis', 'Style recommendations', 'Color matching', 'Trend guidance'],
-    price: '₦20,000',
+    price: '₦5,000',
   },
 ])
+
+// Book Consultation Function
+async function bookConsultation() {
+  const themeColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--theme-color')
+    .trim()
+
+  // Step 1: Show consultation fee notice
+  const result = await Swal.fire({
+    title: `<strong style="color: ${themeColor};">Book a Consultation</strong>`,
+    html: `
+      <div style="text-align: left; padding: 20px;">
+        <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+          Thank you for your interest in booking a consultation with us!
+        </p>
+        <div style="background: #fff9e6; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid ${themeColor};">
+          <h3 style="color: #000; margin-bottom: 15px; font-size: 18px;">
+            <i class="fas fa-info-circle" style="color: ${themeColor};"></i> Consultation Fee
+          </h3>
+          <p style="font-size: 28px; color: ${themeColor}; font-weight: bold; margin: 10px 0;">
+            ₦5,000
+          </p>
+          <p style="font-size: 14px; color: #666; margin-top: 10px;">
+            This fee covers a comprehensive 30-minute style consultation session where we'll discuss your fashion needs and preferences.
+          </p>
+        </div>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+          <p style="font-size: 14px; color: #555; margin-bottom: 10px;">
+            <strong>What's Included:</strong>
+          </p>
+          <ul style="font-size: 13px; color: #666; margin: 0; padding-left: 20px;">
+            <li>Personalized style assessment</li>
+            <li>Fabric and design recommendations</li>
+            <li>Budget planning guidance</li>
+            <li>Timeline discussion</li>
+          </ul>
+        </div>
+        <p style="font-size: 14px; color: #888; margin-top: 20px; font-style: italic;">
+          <i class="fas fa-check-circle" style="color: #4caf50;"></i> Payment can be made via bank transfer or cash
+        </p>
+      </div>
+    `,
+    icon: 'warning',
+    iconColor: themeColor,
+    showCancelButton: true,
+    confirmButtonText: 'Proceed to WhatsApp',
+    cancelButtonText: 'Maybe Later',
+    confirmButtonColor: themeColor,
+    cancelButtonColor: '#888',
+    background: '#fff',
+    customClass: {
+      popup: 'consultation-popup',
+      confirmButton: 'consultation-confirm-btn',
+      cancelButton: 'consultation-cancel-btn',
+    },
+    width: '600px',
+  })
+
+  // Step 2: If user confirms, show payment confirmation
+  if (result.isConfirmed) {
+    const confirmPayment = await Swal.fire({
+      title: `<strong style="color: ${themeColor};">Confirm Payment Intent</strong>`,
+      html: `
+        <div style="text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px;">
+            💳
+          </div>
+          <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+            By proceeding, you confirm that you're ready to pay the consultation fee of <strong style="color: ${themeColor};">₦5,000</strong>.
+          </p>
+          <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="font-size: 14px; color: #555; margin-bottom: 10px;">
+              <strong>Next Steps:</strong>
+            </p>
+            <ol style="font-size: 13px; color: #666; text-align: left; margin: 0; padding-left: 20px;">
+              <li>You'll be redirected to WhatsApp</li>
+              <li>Send the pre-filled message</li>
+              <li>Our team will provide payment details</li>
+              <li>Once paid, we'll schedule your consultation</li>
+            </ol>
+          </div>
+          <p style="font-size: 13px; color: #999; margin-top: 20px;">
+            <i class="fas fa-lock" style="color: #4caf50;"></i> Your information is secure
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      iconColor: themeColor,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Contact via WhatsApp',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#888',
+      background: '#fff',
+      width: '550px',
+    })
+
+    // Step 3: Redirect to WhatsApp
+    if (confirmPayment.isConfirmed) {
+      const message = encodeURIComponent(
+        `Hello! I would like to book a consultation session.\n\n` +
+          `I understand there's a consultation fee of ₦5,000, and I'm ready to proceed.\n\n` +
+          `Please provide me with the payment details and available consultation slots.\n\n` +
+          `Thank you!`,
+      )
+
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`
+
+      // Show success message
+      await Swal.fire({
+        title: '<strong style="color: #25D366;">Redirecting to WhatsApp...</strong>',
+        html: `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">
+              <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+            </div>
+            <p style="font-size: 16px; color: #333;">
+              You're being redirected to WhatsApp to complete your booking.
+            </p>
+            <p style="font-size: 14px; color: #888; margin-top: 15px;">
+              If the window doesn't open automatically, <a href="${whatsappUrl}" target="_blank" style="color: ${themeColor}; text-decoration: underline;">click here</a>.
+            </p>
+          </div>
+        `,
+        icon: 'success',
+        iconColor: '#25D366',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        background: '#fff',
+      })
+
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank')
+    }
+  }
+}
+
+// Book Service Function
+async function bookService(serviceTitle) {
+  const themeColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--theme-color')
+    .trim()
+
+  const message = encodeURIComponent(
+    `Hello! I'm interested in booking your "${serviceTitle}" service.\n\n` +
+      `Could you please provide more details about:\n` +
+      `- Available dates\n` +
+      `- Exact pricing\n` +
+      `- What I need to prepare\n\n` +
+      `Thank you!`,
+  )
+
+  const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`
+
+  const result = await Swal.fire({
+    title: `<strong style="color: ${themeColor};">Book ${serviceTitle}</strong>`,
+    html: `
+      <div style="text-align: center; padding: 20px;">
+        <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+          You'll be redirected to WhatsApp to discuss your <strong>${serviceTitle}</strong> booking.
+        </p>
+        <div style="font-size: 64px; margin: 20px 0;">
+          <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+        </div>
+      </div>
+    `,
+    icon: 'info',
+    iconColor: themeColor,
+    showCancelButton: true,
+    confirmButtonText: 'Contact via WhatsApp',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#25D366',
+    cancelButtonColor: '#888',
+    background: '#fff',
+  })
+
+  if (result.isConfirmed) {
+    window.open(whatsappUrl, '_blank')
+  }
+}
 </script>
 
 <style scoped>
@@ -172,7 +352,7 @@ const services = ref([
   left: -5%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.1) 0%, transparent 70%);
   animation: float 8s ease-in-out infinite;
 }
 
@@ -181,7 +361,7 @@ const services = ref([
   right: -5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.08) 0%, transparent 70%);
   animation: float 10s ease-in-out infinite reverse;
 }
 
@@ -196,7 +376,7 @@ const services = ref([
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: #ffd700;
+  color: var(--theme-color);
   font-weight: 300;
   display: block;
   margin-bottom: 15px;
@@ -211,7 +391,7 @@ const services = ref([
 }
 
 .highlight {
-  color: #ffd700;
+  color: var(--theme-color);
   font-style: italic;
 }
 
@@ -235,7 +415,7 @@ const services = ref([
   position: relative;
   background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(var(--theme-color-rgb), 0.2);
   border-radius: 16px;
   padding: 40px;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -246,8 +426,8 @@ const services = ref([
 
 .service-card:hover {
   transform: translateY(-10px);
-  border-color: rgba(255, 215, 0, 0.5);
-  box-shadow: 0 20px 60px rgba(255, 215, 0, 0.2);
+  border-color: rgba(var(--theme-color-rgb), 0.5);
+  box-shadow: 0 20px 60px rgba(var(--theme-color-rgb), 0.2);
   background: rgba(20, 20, 20, 0.8);
 }
 
@@ -262,7 +442,7 @@ const services = ref([
   right: -50%;
   width: 200px;
   height: 200px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.15) 0%, transparent 70%);
   transition: all 0.5s ease;
 }
 
@@ -274,8 +454,12 @@ const services = ref([
 .service-icon {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.2),
+    rgba(var(--theme-color-rgb), 0.05)
+  );
+  border: 2px solid rgba(var(--theme-color-rgb), 0.3);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -285,13 +469,24 @@ const services = ref([
 }
 
 .service-card:hover .service-icon {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.1));
-  border-color: #ffd700;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.3),
+    rgba(var(--theme-color-rgb), 0.1)
+  );
+  border-color: var(--theme-color);
   transform: rotate(5deg) scale(1.1);
 }
 
-.icon {
+.service-icon i {
   font-size: 36px;
+  color: var(--theme-color);
+  transition: all 0.4s ease;
+}
+
+.service-card:hover .service-icon i {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }
 
 /* Service Content */
@@ -331,12 +526,12 @@ const services = ref([
 .check-icon {
   width: 20px;
   height: 20px;
-  background: rgba(255, 215, 0, 0.2);
+  background: rgba(var(--theme-color-rgb), 0.2);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffd700;
+  color: var(--theme-color);
   font-size: 12px;
   font-weight: bold;
   flex-shrink: 0;
@@ -349,8 +544,8 @@ const services = ref([
   gap: 8px;
   margin-bottom: 25px;
   padding: 20px 0;
-  border-top: 1px solid rgba(255, 215, 0, 0.2);
-  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  border-top: 1px solid rgba(var(--theme-color-rgb), 0.2);
+  border-bottom: 1px solid rgba(var(--theme-color-rgb), 0.2);
 }
 
 .from {
@@ -363,7 +558,7 @@ const services = ref([
 .price {
   font-family: 'Playfair Display', serif;
   font-size: 32px;
-  color: #ffd700;
+  color: var(--theme-color);
   font-weight: 600;
 }
 
@@ -372,8 +567,8 @@ const services = ref([
   width: 100%;
   padding: 14px;
   background: transparent;
-  color: #ffd700;
-  border: 2px solid #ffd700;
+  color: var(--theme-color);
+  border: 2px solid var(--theme-color);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 2px;
@@ -389,7 +584,7 @@ const services = ref([
   content: '';
   position: absolute;
   inset: 0;
-  background: #ffd700;
+  background: var(--theme-color);
   transform: scaleY(0);
   transform-origin: bottom;
   transition: transform 0.4s ease;
@@ -406,8 +601,12 @@ const services = ref([
 
 /* Bottom CTA */
 .bottom-cta {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.1),
+    rgba(var(--theme-color-rgb), 0.05)
+  );
+  border: 2px solid rgba(var(--theme-color-rgb), 0.3);
   border-radius: 16px;
   padding: 60px;
   text-align: center;
@@ -419,7 +618,12 @@ const services = ref([
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.05) 50%, transparent 70%);
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(var(--theme-color-rgb), 0.05) 50%,
+    transparent 70%
+  );
   animation: shimmer 3s linear infinite;
 }
 
@@ -447,7 +651,7 @@ const services = ref([
 
 .btn-consultation {
   padding: 16px 40px;
-  background: #ffd700;
+  background: var(--theme-color);
   color: #000;
   border: none;
   font-size: 14px;
@@ -460,9 +664,9 @@ const services = ref([
 }
 
 .btn-consultation:hover {
-  background: #ffed4e;
+  filter: brightness(1.1);
   transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb), 0.4);
 }
 
 /* Animations */

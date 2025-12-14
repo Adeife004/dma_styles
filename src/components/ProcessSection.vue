@@ -31,14 +31,16 @@
 
           <!-- Step Content -->
           <div class="step-content">
-            <div class="step-icon">{{ step.icon }}</div>
+            <div class="step-icon">
+              <i :class="step.icon"></i>
+            </div>
             <h3 class="step-title">{{ step.title }}</h3>
             <p class="step-description">{{ step.description }}</p>
             <ul class="step-details">
               <li v-for="(detail, i) in step.details" :key="i">{{ detail }}</li>
             </ul>
             <div class="step-duration">
-              <span class="clock-icon">⏱️</span>
+              <i class="fas fa-clock"></i>
               <span>{{ step.duration }}</span>
             </div>
           </div>
@@ -49,17 +51,23 @@
       <div class="process-info">
         <div class="info-grid">
           <div class="info-card">
-            <div class="info-icon">📅</div>
+            <div class="info-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
             <h4 class="info-title">Typical Timeline</h4>
             <p class="info-text">2-4 weeks from consultation to completion</p>
           </div>
           <div class="info-card">
-            <div class="info-icon">💎</div>
+            <div class="info-icon">
+              <i class="fas fa-gem"></i>
+            </div>
             <h4 class="info-title">Quality Guaranteed</h4>
-            <p class="info-text">Free alterations within 30 days of delivery</p>
+            <p class="info-text">Free alterations within 3 days of delivery</p>
           </div>
           <div class="info-card">
-            <div class="info-icon">🎯</div>
+            <div class="info-icon">
+              <i class="fas fa-bullseye"></i>
+            </div>
             <h4 class="info-title">Perfect Fit Promise</h4>
             <p class="info-text">Multiple fittings to ensure perfection</p>
           </div>
@@ -70,7 +78,7 @@
       <div class="process-cta">
         <h3 class="cta-title">Ready to Start Your Journey?</h3>
         <p class="cta-text">Book your consultation today and let's bring your vision to life</p>
-        <button class="btn-start">Get Started Now</button>
+        <button class="btn-start" @click="bookConsultation">Get Started Now</button>
       </div>
     </div>
 
@@ -85,12 +93,15 @@
 
 <script setup>
 import { ref } from 'vue'
+import Swal from 'sweetalert2'
 
 const activeStep = ref(null)
 
+const WHATSAPP_NUMBER = '2348160763959'
+
 const processSteps = ref([
   {
-    icon: '💬',
+    icon: 'fas fa-comments',
     title: 'Consultation',
     description:
       'We start with understanding your vision, style preferences, and occasion requirements',
@@ -103,7 +114,7 @@ const processSteps = ref([
     duration: '30-45 minutes',
   },
   {
-    icon: '📐',
+    icon: 'fas fa-ruler-combined',
     title: 'Design & Measurements',
     description: 'Our designers create your custom pattern and take precise measurements',
     details: [
@@ -115,7 +126,7 @@ const processSteps = ref([
     duration: '45-60 minutes',
   },
   {
-    icon: '✂️',
+    icon: 'fas fa-cut',
     title: 'Crafting',
     description:
       'Our skilled artisans bring your design to life with meticulous attention to detail',
@@ -128,7 +139,7 @@ const processSteps = ref([
     duration: '1-2 weeks',
   },
   {
-    icon: '👗',
+    icon: 'fas fa-tshirt',
     title: 'First Fitting',
     description: 'Try on your garment and we make any necessary adjustments for the perfect fit',
     details: [
@@ -140,7 +151,7 @@ const processSteps = ref([
     duration: '30 minutes',
   },
   {
-    icon: '✨',
+    icon: 'fas fa-star',
     title: 'Final Touches',
     description: 'We add finishing details and make final refinements based on your feedback',
     details: [
@@ -152,7 +163,7 @@ const processSteps = ref([
     duration: '3-5 days',
   },
   {
-    icon: '🎁',
+    icon: 'fas fa-gift',
     title: 'Delivery',
     description: 'Your masterpiece is ready! Receive your garment with care instructions',
     details: [
@@ -164,6 +175,138 @@ const processSteps = ref([
     duration: 'Same day',
   },
 ])
+
+// Book Consultation Function
+async function bookConsultation() {
+  const themeColor = getComputedStyle(document.documentElement)
+    .getPropertyValue('--theme-color')
+    .trim()
+
+  // Step 1: Show consultation fee notice
+  const result = await Swal.fire({
+    title: `<strong style="color: ${themeColor};">Book a Consultation</strong>`,
+    html: `
+      <div style="text-align: left; padding: 20px;">
+        <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+          Thank you for your interest in booking a consultation with us!
+        </p>
+        <div style="background: #fff9e6; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid ${themeColor};">
+          <h3 style="color: #000; margin-bottom: 15px; font-size: 18px;">
+            <i class="fas fa-info-circle" style="color: ${themeColor};"></i> Consultation Fee
+          </h3>
+          <p style="font-size: 28px; color: ${themeColor}; font-weight: bold; margin: 10px 0;">
+            ₦5,000
+          </p>
+          <p style="font-size: 14px; color: #666; margin-top: 10px;">
+            This fee covers a comprehensive 30-minute style consultation session where we'll discuss your fashion needs and preferences.
+          </p>
+        </div>
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+          <p style="font-size: 14px; color: #555; margin-bottom: 10px;">
+            <strong>What's Included:</strong>
+          </p>
+          <ul style="font-size: 13px; color: #666; margin: 0; padding-left: 20px;">
+            <li>Personalized style assessment</li>
+            <li>Fabric and design recommendations</li>
+            <li>Budget planning guidance</li>
+            <li>Timeline discussion</li>
+          </ul>
+        </div>
+        <p style="font-size: 14px; color: #888; margin-top: 20px; font-style: italic;">
+          <i class="fas fa-check-circle" style="color: #4caf50;"></i> Payment can be made via bank transfer or cash
+        </p>
+      </div>
+    `,
+    icon: 'warning',
+    iconColor: themeColor,
+    showCancelButton: true,
+    confirmButtonText: 'Proceed to WhatsApp',
+    cancelButtonText: 'Maybe Later',
+    confirmButtonColor: themeColor,
+    cancelButtonColor: '#888',
+    background: '#fff',
+    width: '600px',
+  })
+
+  // Step 2: If user confirms, show payment confirmation
+  if (result.isConfirmed) {
+    const confirmPayment = await Swal.fire({
+      title: `<strong style="color: ${themeColor};">Confirm Payment Intent</strong>`,
+      html: `
+        <div style="text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px;">
+            💳
+          </div>
+          <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+            By proceeding, you confirm that you're ready to pay the consultation fee of <strong style="color: ${themeColor};">₦5,000</strong>.
+          </p>
+          <div style="background: #f0f0f0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="font-size: 14px; color: #555; margin-bottom: 10px;">
+              <strong>Next Steps:</strong>
+            </p>
+            <ol style="font-size: 13px; color: #666; text-align: left; margin: 0; padding-left: 20px;">
+              <li>You'll be redirected to WhatsApp</li>
+              <li>Send the pre-filled message</li>
+              <li>Our team will provide payment details</li>
+              <li>Once paid, we'll schedule your consultation</li>
+            </ol>
+          </div>
+          <p style="font-size: 13px; color: #999; margin-top: 20px;">
+            <i class="fas fa-lock" style="color: #4caf50;"></i> Your information is secure
+          </p>
+        </div>
+      `,
+      icon: 'question',
+      iconColor: themeColor,
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Contact via WhatsApp',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#25D366',
+      cancelButtonColor: '#888',
+      background: '#fff',
+      width: '550px',
+    })
+
+    // Step 3: Redirect to WhatsApp
+    if (confirmPayment.isConfirmed) {
+      const message = encodeURIComponent(
+        `Hello! I would like to book a consultation session.\n\n` +
+          `I understand there's a consultation fee of ₦5,000, and I'm ready to proceed.\n\n` +
+          `Please provide me with the payment details and available consultation slots.\n\n` +
+          `Thank you!`,
+      )
+
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`
+
+      // Show success message
+      await Swal.fire({
+        title: '<strong style="color: #25D366;">Redirecting to WhatsApp...</strong>',
+        html: `
+          <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">
+              <i class="fab fa-whatsapp" style="color: #25D366;"></i>
+            </div>
+            <p style="font-size: 16px; color: #333;">
+              You're being redirected to WhatsApp to complete your booking.
+            </p>
+            <p style="font-size: 14px; color: #888; margin-top: 15px;">
+              If the window doesn't open automatically, <a href="${whatsappUrl}" target="_blank" style="color: ${themeColor}; text-decoration: underline;">click here</a>.
+            </p>
+          </div>
+        `,
+        icon: 'success',
+        iconColor: '#25D366',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        background: '#fff',
+      })
+
+      // Open WhatsApp
+      window.open(whatsappUrl, '_blank')
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -193,7 +336,7 @@ const processSteps = ref([
 .bg-circle {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(var(--theme-color-rgb), 0.08) 0%, transparent 70%);
 }
 
 .circle-1 {
@@ -231,7 +374,7 @@ const processSteps = ref([
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: #ffd700;
+  color: var(--theme-color);
   font-weight: 300;
   display: block;
   margin-bottom: 15px;
@@ -246,7 +389,7 @@ const processSteps = ref([
 }
 
 .highlight {
-  color: #ffd700;
+  color: var(--theme-color);
   font-style: italic;
 }
 
@@ -282,8 +425,12 @@ const processSteps = ref([
 .step-number {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.05));
-  border: 3px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.2),
+    rgba(var(--theme-color-rgb), 0.05)
+  );
+  border: 3px solid rgba(var(--theme-color-rgb), 0.3);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -291,7 +438,7 @@ const processSteps = ref([
   font-family: 'Playfair Display', serif;
   font-size: 32px;
   font-weight: 600;
-  color: #ffd700;
+  color: var(--theme-color);
   transition: all 0.4s ease;
   position: relative;
   z-index: 2;
@@ -299,10 +446,14 @@ const processSteps = ref([
 
 .process-step.active .step-number,
 .process-step:hover .step-number {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.4), rgba(255, 215, 0, 0.15));
-  border-color: #ffd700;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.4),
+    rgba(var(--theme-color-rgb), 0.15)
+  );
+  border-color: var(--theme-color);
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb), 0.3);
 }
 
 .connector-line {
@@ -311,7 +462,7 @@ const processSteps = ref([
   left: 80px;
   width: calc(100% + 40px);
   height: 2px;
-  background: linear-gradient(90deg, rgba(255, 215, 0, 0.5), transparent);
+  background: linear-gradient(90deg, rgba(var(--theme-color-rgb), 0.5), transparent);
   transform: translateY(-50%);
   z-index: 1;
 }
@@ -320,7 +471,7 @@ const processSteps = ref([
 .step-content {
   background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(var(--theme-color-rgb), 0.2);
   border-radius: 16px;
   padding: 35px;
   transition: all 0.4s ease;
@@ -330,15 +481,19 @@ const processSteps = ref([
 .process-step.active .step-content,
 .process-step:hover .step-content {
   background: rgba(20, 20, 20, 0.8);
-  border-color: rgba(255, 215, 0, 0.5);
+  border-color: rgba(var(--theme-color-rgb), 0.5);
   transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(255, 215, 0, 0.15);
+  box-shadow: 0 15px 40px rgba(var(--theme-color-rgb), 0.15);
 }
 
 .step-icon {
-  font-size: 48px;
   margin-bottom: 20px;
   transition: transform 0.4s ease;
+}
+
+.step-icon i {
+  font-size: 48px;
+  color: var(--theme-color);
 }
 
 .process-step:hover .step-icon {
@@ -375,11 +530,12 @@ const processSteps = ref([
 }
 
 .step-details li::before {
-  content: '✓';
+  content: '\f00c';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
   position: absolute;
   left: 0;
-  color: #ffd700;
-  font-weight: bold;
+  color: var(--theme-color);
 }
 
 .step-duration {
@@ -387,14 +543,14 @@ const processSteps = ref([
   align-items: center;
   gap: 8px;
   padding-top: 15px;
-  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  border-top: 1px solid rgba(var(--theme-color-rgb), 0.2);
   font-size: 14px;
-  color: #ffd700;
+  color: var(--theme-color);
   font-weight: 600;
 }
 
-.clock-icon {
-  font-size: 18px;
+.step-duration i {
+  font-size: 16px;
 }
 
 /* Process Info */
@@ -409,8 +565,12 @@ const processSteps = ref([
 }
 
 .info-card {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.1),
+    rgba(var(--theme-color-rgb), 0.05)
+  );
+  border: 2px solid rgba(var(--theme-color-rgb), 0.3);
   border-radius: 12px;
   padding: 30px;
   text-align: center;
@@ -419,13 +579,17 @@ const processSteps = ref([
 
 .info-card:hover {
   transform: translateY(-5px);
-  border-color: #ffd700;
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+  border-color: var(--theme-color);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb), 0.2);
 }
 
 .info-icon {
-  font-size: 48px;
   margin-bottom: 15px;
+}
+
+.info-icon i {
+  font-size: 48px;
+  color: var(--theme-color);
 }
 
 .info-title {
@@ -444,8 +608,12 @@ const processSteps = ref([
 /* Process CTA */
 .process-cta {
   text-align: center;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--theme-color-rgb), 0.15),
+    rgba(var(--theme-color-rgb), 0.05)
+  );
+  border: 2px solid rgba(var(--theme-color-rgb), 0.3);
   border-radius: 16px;
   padding: 60px 40px;
   position: relative;
@@ -456,7 +624,12 @@ const processSteps = ref([
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.1) 50%, transparent 70%);
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(var(--theme-color-rgb), 0.1) 50%,
+    transparent 70%
+  );
   animation: shimmer 3s linear infinite;
 }
 
@@ -480,7 +653,7 @@ const processSteps = ref([
 
 .btn-start {
   padding: 18px 50px;
-  background: #ffd700;
+  background: var(--theme-color);
   color: #000;
   border: none;
   font-size: 15px;
@@ -495,9 +668,9 @@ const processSteps = ref([
 }
 
 .btn-start:hover {
-  background: #ffed4e;
+  filter: brightness(1.1);
   transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb), 0.5);
 }
 
 /* Animations */

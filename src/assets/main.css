@@ -1,12 +1,33 @@
 /* Import Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
 
+/* PREVENT WHITE FLASH - CRITICAL */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0f0f0f !important;
+  color: #fff;
+  min-height: 100vh;
+}
+
+#app {
+  background-color: #0f0f0f;
+  min-height: 100vh;
+}
+
 /* global reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   scroll-behavior: smooth;
+}
+
+/* Smooth color transitions for dynamic theme changes */
+* {
+  transition-property: color, background-color, border-color, box-shadow, outline-color;
+  transition-duration: 0.3s;
 }
 
 /* Apply fonts */
@@ -39,4 +60,353 @@ p {
 
 .light-text {
   font-weight: 300;
+}
+
+:root {
+  --theme-color: #ffd700;
+  --theme-color-rgb: 255, 215, 0;
+  --accent-color: #ffd700;
+  --accent-color-rgb: 255, 215, 0;
+  --background-primary: #0f0f0f;
+  --background-secondary: #1a1a1a;
+}
+
+/* Base theme classes */
+.btn-primary {
+  background: var(--theme-color);
+  color: #000;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.4);
+}
+
+.text-gold {
+  color: var(--theme-color);
+}
+
+.border-gold {
+  border-color: var(--theme-color);
+}
+
+.bg-gold {
+  background: var(--theme-color);
+}
+
+.hover\:text-gold:hover {
+  color: var(--theme-color);
+}
+
+.hover\:border-gold:hover {
+  border-color: var(--theme-color);
+}
+
+/* Transparency effects */
+.bg-gold-5 {
+  background: rgba(var(--theme-color-rgb), 0.05);
+}
+
+.bg-gold-10 {
+  background: rgba(var(--theme-color-rgb), 0.1);
+}
+
+.bg-gold-20 {
+  background: rgba(var(--theme-color-rgb), 0.2);
+}
+
+.bg-gold-30 {
+  background: rgba(var(--theme-color-rgb), 0.3);
+}
+
+.bg-gold-50 {
+  background: rgba(var(--theme-color-rgb), 0.5);
+}
+
+/* Shadow effects */
+.shadow-gold {
+  box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.3);
+}
+
+.shadow-gold-lg {
+  box-shadow: 0 8px 24px rgba(var(--theme-color-rgb), 0.4);
+}
+
+.hover\:shadow-gold:hover {
+  box-shadow: 0 4px 12px rgba(var(--theme-color-rgb), 0.3);
+}
+
+/* Ring/Outline effects */
+.ring-gold {
+  outline: 2px solid var(--theme-color);
+  outline-offset: 2px;
+}
+
+.focus\:ring-gold:focus {
+  outline: 2px solid var(--theme-color);
+  outline-offset: 2px;
+}
+
+/* Border utilities */
+.border-t-gold {
+  border-top-color: var(--theme-color);
+}
+
+.border-b-gold {
+  border-bottom-color: var(--theme-color);
+}
+
+.border-l-gold {
+  border-left-color: var(--theme-color);
+}
+
+.border-r-gold {
+  border-right-color: var(--theme-color);
+}
+
+/* Gradient utilities */
+.bg-gradient-gold {
+  background: linear-gradient(135deg, var(--theme-color), rgba(var(--theme-color-rgb), 0.7));
+}
+
+.bg-gradient-gold-to-black {
+  background: linear-gradient(135deg, var(--theme-color), #000);
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--theme-color), rgba(var(--theme-color-rgb), 0.7));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Accent color for form inputs */
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--theme-color);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline-color: var(--theme-color);
+  border-color: var(--theme-color);
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--theme-color);
+}
+
+/* Buttons with theme color */
+button {
+  transition: all 0.3s ease;
+}
+
+button:focus {
+  outline-color: var(--theme-color);
+}
+
+/* Selection color */
+::selection {
+  background: var(--theme-color);
+  color: #000;
+}
+
+::-moz-selection {
+  background: var(--theme-color);
+  color: #000;
+}
+
+/* Page Transition Animations */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Smooth transitions for route changes */
+.page-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.page-leave-active {
+  transition: all 0.3s ease-in;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Prevent scrollbar from showing white */
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: #0f0f0f;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #0f0f0f;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #333;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--theme-color);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #333 #0f0f0f;
+}
+
+/* Loading spinner with theme color */
+.spinner {
+  border: 3px solid rgba(var(--theme-color-rgb), 0.1);
+  border-top-color: var(--theme-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse animation with theme color */
+.pulse-gold {
+  animation: pulse-gold 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-gold {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Glow effect with theme color */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(var(--theme-color-rgb), 0.6);
+}
+
+.hover\:glow-gold:hover {
+  box-shadow: 0 0 20px rgba(var(--theme-color-rgb), 0.6);
+}
+
+/* Badge/Pill with theme color */
+.badge-gold {
+  background: var(--theme-color);
+  color: #000;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Divider with theme color */
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--theme-color), transparent);
+}
+
+/* Tooltip styles */
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--theme-color);
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  z-index: 1000;
+}
+
+/* Card styles with theme accent */
+.card-gold {
+  border: 1px solid rgba(var(--theme-color-rgb), 0.2);
+  transition: all 0.3s ease;
+}
+
+.card-gold:hover {
+  border-color: var(--theme-color);
+  box-shadow: 0 8px 24px rgba(var(--theme-color-rgb), 0.2);
+}
+
+/* Progress bar with theme color */
+.progress-bar {
+  background: rgba(var(--theme-color-rgb), 0.2);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: var(--theme-color);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+/* Alert/Notification styles */
+.alert-gold {
+  background: rgba(var(--theme-color-rgb), 0.1);
+  border-left: 4px solid var(--theme-color);
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+/* Tab active state */
+.tab-active {
+  color: var(--theme-color);
+  border-bottom: 2px solid var(--theme-color);
+}
+
+/* Smooth color transitions for dynamic theme changes */
+* {
+  transition-property: color, background-color, border-color, box-shadow, outline-color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* Exclude animations and transforms from theme transitions */
+*:not(.no-theme-transition) {
+  transition-property: color, background-color, border-color, box-shadow, outline-color;
+}
+
+.no-theme-transition {
+  transition: none !important;
 }

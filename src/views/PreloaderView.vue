@@ -6,7 +6,7 @@
         <path
           id="thread-path"
           d="M50 100 Q200 50, 350 100 T550 100"
-          stroke="#FFD700"
+          stroke="var(--theme-color)"
           stroke-width="2"
           fill="none"
           stroke-linecap="round"
@@ -24,7 +24,7 @@
         </path>
 
         <!-- Needle (moving circle) -->
-        <circle r="4" fill="#FFD700">
+        <circle r="4" fill="var(--theme-color)">
           <animateMotion dur="3s" fill="freeze" repeatCount="1">
             <mpath href="#thread-path" />
           </animateMotion>
@@ -36,7 +36,7 @@
           y="65%"
           text-anchor="middle"
           fill="none"
-          stroke="#FFD700"
+          stroke="var(--theme-color)"
           stroke-width="1"
           font-size="36"
           font-family="'Playfair Display', serif"

@@ -17,11 +17,22 @@
           :key="index"
           class="collection-item"
           :style="{ animationDelay: `${index * 0.1}s` }"
+          @mouseenter="hoveredItem = index"
+          @mouseleave="hoveredItem = null"
+          @click="selectCollection(item)"
         >
           <div class="image-wrapper">
             <img :src="item.image" :alt="item.title" />
-            <div class="overlay">
-              <button class="view-btn">View Details</button>
+            <div class="overlay" :class="{ active: hoveredItem === index }">
+              <div class="details-content">
+                <h4 class="detail-title">{{ item.title }}</h4>
+                <p class="detail-description">{{ item.description }}</p>
+                <div class="detail-features">
+                  <span v-for="(feature, i) in item.features" :key="i" class="feature-tag">
+                    {{ feature }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
           <div class="item-info">
@@ -30,50 +41,83 @@
           </div>
         </div>
       </div>
-
-      <!-- CTA Button -->
-      <div class="section-cta">
-        <button class="btn-explore">Explore Full Collection</button>
-      </div>
     </div>
   </section>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useTheme } from '../composables/useTheme'
+import image1 from '../assets/bridal_luxe.jpg'
+import image2 from '../assets/royal_statement.jpeg'
+import image3 from '../assets/ball_gown.jpeg'
+import image4 from '../assets/cooperate.jpeg'
+import image5 from '../assets/dinner_dress.avif'
+import image6 from '../assets/blazer.avif'
+
+const hoveredItem = ref(null)
+const { setTheme } = useTheme()
 
 const collections = ref([
   {
-    title: 'Evening Elegance',
-    category: 'Formal Wear',
-    image: 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=600',
-  },
-  {
-    title: 'Summer Breeze',
-    category: 'Casual Wear',
-    image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600',
+    title: 'Bridal Luxe',
+    category: 'Wedding',
+    image: image1,
+    description:
+      'Exquisite wedding gowns designed to make your special day unforgettable with intricate lace and premium fabrics.',
+    features: ['Custom Fit', 'Premium Lace', 'Hand-Embroidered'],
+    themeColor: '#ffd700', // Gold
   },
   {
     title: 'Royal Statement',
     category: 'Traditional',
-    image: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=600',
+    image: image2,
+    description:
+      'Bold traditional attire that celebrates African heritage with rich colors and authentic cultural designs.',
+    features: ['Cultural Design', 'Rich Fabrics', 'Bespoke Tailoring'],
+    themeColor: '#ff6b6b', // Rose Red
+  },
+  {
+    title: 'Modern Fairytale',
+    category: 'Ball Gown',
+    image: image3,
+    description:
+      'Enchanting ball gowns perfect for galas and formal events, combining elegance with contemporary fashion.',
+    features: ['Elegant Draping', 'Statement Piece', 'Red Carpet Ready'],
+    themeColor: '#b8860b', // Dark Gold
   },
   {
     title: 'Modern Classic',
     category: 'Business',
-    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600',
+    image: image4,
+    description:
+      'Professional corporate wear tailored to perfection, ensuring you look sharp and confident in any business setting.',
+    features: ['Professional Cut', 'Premium Wool', 'All-Day Comfort'],
+    themeColor: '#c0c0c0', // Silver
   },
   {
-    title: 'Bridal Luxe',
-    category: 'Wedding',
-    image: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600',
+    title: 'Evening Elegance',
+    category: 'Dinner Dress',
+    image: image5,
+    description:
+      'Sophisticated dinner dresses that exude grace and charm, perfect for upscale dining and evening occasions.',
+    features: ['Timeless Design', 'Luxe Fabric', 'Figure-Flattering'],
+    themeColor: '#daa520', // Goldenrod
   },
   {
-    title: 'Street Chic',
-    category: 'Streetwear',
-    image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600',
+    title: 'Executive Power',
+    category: 'Blazer',
+    image: image6,
+    description:
+      'Impeccably tailored blazers that command attention and respect in every boardroom and business meeting.',
+    features: ['Sharp Tailoring', 'Premium Finish', 'Versatile Style'],
+    themeColor: '#ffd700', // Gold
   },
 ])
+
+const selectCollection = (item) => {
+  setTheme(item.themeColor)
+}
 </script>
 
 <style scoped>
@@ -113,7 +157,7 @@ const collections = ref([
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: #ffd700;
+  color: var(--theme-color);
   font-weight: 300;
   display: block;
   margin-bottom: 15px;
@@ -129,7 +173,7 @@ const collections = ref([
 }
 
 .highlight {
-  color: #ffd700;
+  color: var(--theme-color);
   font-style: italic;
 }
 
@@ -153,6 +197,11 @@ const collections = ref([
   opacity: 0;
   animation: fadeInUp 0.8s ease forwards;
   cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.collection-item:hover {
+  transform: translateY(-8px);
 }
 
 .image-wrapper {
@@ -172,7 +221,7 @@ const collections = ref([
 }
 
 .collection-item:hover .image-wrapper img {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .overlay {
@@ -180,43 +229,76 @@ const collections = ref([
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(0, 0, 0, 0.8) 0%,
-    rgba(0, 0, 0, 0.4) 50%,
-    transparent 100%
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.85) 60%,
+    rgba(0, 0, 0, 0.6) 100%
   );
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  padding: 30px;
   opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.collection-item:hover .overlay {
-  opacity: 1;
-}
-
-.view-btn {
-  padding: 12px 30px;
-  background: #ffd700;
-  color: #000;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 4px;
   transform: translateY(20px);
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
-.collection-item:hover .view-btn {
+.overlay.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.details-content {
+  width: 100%;
+  text-align: center;
+  transform: translateY(30px);
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.overlay.active .details-content {
   transform: translateY(0);
 }
 
-.view-btn:hover {
-  background: #ffed4e;
-  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+.detail-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px;
+  color: var(--theme-color);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.detail-description {
+  font-size: 14px;
+  color: #e0e0e0;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.detail-features {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feature-tag {
+  padding: 6px 14px;
+  background: rgba(var(--theme-color-rgb), 0.15);
+  border: 1px solid rgba(var(--theme-color-rgb), 0.3);
+  color: var(--theme-color);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.feature-tag:hover {
+  background: rgba(var(--theme-color-rgb), 0.25);
+  border-color: var(--theme-color);
 }
 
 /* Item Info */
@@ -230,55 +312,19 @@ const collections = ref([
   color: white;
   margin-bottom: 8px;
   font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.collection-item:hover .item-title {
+  color: var(--theme-color);
 }
 
 .item-category {
   font-size: 14px;
-  color: #ffd700;
+  color: var(--theme-color);
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: 300;
-}
-
-/* Section CTA */
-.section-cta {
-  text-align: center;
-}
-
-.btn-explore {
-  padding: 16px 40px;
-  background: transparent;
-  color: #ffd700;
-  border: 2px solid #ffd700;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.4s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-explore::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: #ffd700;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s ease;
-  z-index: -1;
-}
-
-.btn-explore:hover::before {
-  transform: scaleX(1);
-}
-
-.btn-explore:hover {
-  color: #000;
-  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
 }
 
 /* Animations */
@@ -294,6 +340,21 @@ const collections = ref([
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .collection-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+  }
+
+  .detail-title {
+    font-size: 24px;
+  }
+
+  .detail-description {
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 768px) {
   .featured-collection {
     padding: 60px 0;
@@ -318,6 +379,48 @@ const collections = ref([
 
   .item-title {
     font-size: 20px;
+  }
+
+  .overlay {
+    padding: 20px;
+  }
+
+  .detail-title {
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+
+  .detail-description {
+    font-size: 12px;
+    margin-bottom: 15px;
+  }
+
+  .detail-features {
+    margin-bottom: 0;
+  }
+
+  .feature-tag {
+    font-size: 10px;
+    padding: 5px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-title {
+    font-size: 28px;
+  }
+
+  .detail-title {
+    font-size: 20px;
+  }
+
+  .detail-description {
+    font-size: 11px;
+    padding: 0 5px;
   }
 }
 </style>

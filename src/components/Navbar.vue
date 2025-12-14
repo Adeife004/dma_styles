@@ -2,7 +2,7 @@
   <header class="navbar" :class="{ scrolled: isScrolled }">
     <div class="navbar-container">
       <!-- Logo -->
-      <router-link to="/" class="logo" @click="closeMenu">
+      <router-link to="/home" class="logo" @click="closeMenu">
         <img src="../assets/logo.png" alt="DMA Styles" />
       </router-link>
 
@@ -10,9 +10,9 @@
       <nav class="desktop-nav">
         <a href="#home" @click.prevent="scrollToSection('home')">Home</a>
         <a href="#about" @click.prevent="scrollToSection('about')">About</a>
+        <a href="#services" @click.prevent="scrollToSection('services')">Services</a>
         <a href="#testimonials" @click.prevent="scrollToSection('testimonials')">Testimonials</a>
         <a href="#contact" @click.prevent="scrollToSection('contact')">Contact</a>
-        <router-link to="/services" @click="closeMenu">Services</router-link>
         <router-link to="/dashboard" @click="closeMenu">Dashboard</router-link>
       </nav>
 
@@ -40,11 +40,11 @@
         <nav class="mobile-nav">
           <a href="#home" @click.prevent="handleMobileClick('home')">Home</a>
           <a href="#about" @click.prevent="handleMobileClick('about')">About</a>
+          <a href="#services" @click.prevent="handleMobileClick('services')">Services</a>
           <a href="#testimonials" @click.prevent="handleMobileClick('testimonials')">
             Testimonials
           </a>
           <a href="#contact" @click.prevent="handleMobileClick('contact')">Contact</a>
-          <router-link to="/services" @click="closeMenu">Services</router-link>
           <router-link to="/dashboard" @click="closeMenu">Dashboard</router-link>
         </nav>
 
@@ -76,11 +76,19 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useTheme } from '../composables/useTheme'
 
 const router = useRouter()
+const route = useRoute()
 const isMenuOpen = ref(false)
 const isScrolled = ref(false)
+
+// Initialize theme
+const { initTheme } = useTheme()
+
+// Pages that should NOT scroll to sections (they don't have sections)
+const excludedPages = ['/dashboard', '/auth', '/login', '/signup']
 
 // Toggle mobile menu
 const toggleMenu = () => {
@@ -94,25 +102,33 @@ const closeMenu = () => {
   document.body.style.overflow = ''
 }
 
-// Scroll to section
+// Scroll to section with smart routing
 const scrollToSection = (id) => {
-  if (router.currentRoute.value.path !== '/') {
-    router.push('/').then(() => {
-      setTimeout(() => {
-        const element = document.getElementById(id)
-        if (element) element.scrollIntoView({ behavior: 'smooth' })
-      }, 300)
-    })
+  const currentPath = route.path
+
+  // Check if we're on an excluded page (dashboard, auth, etc.)
+  const isExcludedPage = excludedPages.some((page) => currentPath.startsWith(page))
+
+  // Check if we're on home page (either / or /home)
+  const isOnHomePage = currentPath === '/' || currentPath === '/home'
+
+  // If we're on an excluded page OR not on home page, navigate to home first
+  if (isExcludedPage || !isOnHomePage) {
+    router.push('/home#' + id)
   } else {
+    // We're already on home page, just scroll
     const element = document.getElementById(id)
-    if (element) element.scrollIntoView({ behavior: 'smooth' })
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 }
 
 // Handle mobile menu clicks
 const handleMobileClick = (id) => {
   closeMenu()
-  setTimeout(() => scrollToSection(id), 300)
+  // Wait for menu to close before scrolling
+  setTimeout(() => scrollToSection(id), 400)
 }
 
 // Detect scroll
@@ -122,6 +138,20 @@ const handleScroll = () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+
+  // Initialize theme on mount
+  initTheme()
+
+  // Check if there's a hash in the URL on page load
+  if (route.hash) {
+    const sectionId = route.hash.substring(1)
+    setTimeout(() => {
+      const element = document.getElementById(sectionId)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 500)
+  }
 })
 
 onUnmounted(() => {
@@ -143,7 +173,7 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  border-bottom: 1px solid rgba(var(--accent-color-rgb, 255, 215, 0), 0.1);
   transition: all 0.4s ease;
 }
 
@@ -151,7 +181,7 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(25px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  border-bottom: 1px solid rgba(var(--accent-color-rgb, 255, 215, 0), 0.2);
 }
 
 .navbar-container {
@@ -173,13 +203,13 @@ onUnmounted(() => {
 .logo img {
   height: 70px;
   width: auto;
-  filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.3));
+  filter: drop-shadow(0 0 15px rgba(var(--accent-color-rgb, 255, 215, 0), 0.3));
   transition: all 0.3s ease;
 }
 
 .logo:hover img {
   transform: scale(1.05);
-  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6));
+  filter: drop-shadow(0 0 20px rgba(var(--accent-color-rgb, 255, 215, 0), 0.6));
 }
 
 /* ============================================
@@ -199,14 +229,19 @@ onUnmounted(() => {
   letter-spacing: 0.5px;
   position: relative;
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .desktop-nav a::before {
   content: '';
   position: absolute;
   inset: -8px -12px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
-  border: 1px solid rgba(255, 215, 0, 0.3);
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-color-rgb, 255, 215, 0), 0.15),
+    rgba(var(--accent-color-rgb, 255, 215, 0), 0.05)
+  );
+  border: 1px solid rgba(var(--accent-color-rgb, 255, 215, 0), 0.3);
   border-radius: 8px;
   opacity: 0;
   transform: scale(0.8);
@@ -222,8 +257,8 @@ onUnmounted(() => {
 
 .desktop-nav a:hover,
 .desktop-nav a.router-link-active {
-  color: #ffd700;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  color: var(--accent-color, #ffd700);
+  text-shadow: 0 0 10px rgba(var(--accent-color-rgb, 255, 215, 0), 0.5);
 }
 
 /* ============================================
@@ -245,26 +280,26 @@ onUnmounted(() => {
 }
 
 .btn-login {
-  color: #ffd700;
-  border: 2px solid #ffd700;
+  color: var(--accent-color, #ffd700);
+  border: 2px solid var(--accent-color, #ffd700);
   background: transparent;
 }
 
 .btn-login:hover {
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(var(--accent-color-rgb, 255, 215, 0), 0.1);
   transform: translateY(-2px);
 }
 
 .btn-signup {
   color: #000;
-  background: #ffd700;
-  border: 2px solid #ffd700;
+  background: var(--accent-color, #ffd700);
+  border: 2px solid var(--accent-color, #ffd700);
 }
 
 .btn-signup:hover {
-  background: #ffed4e;
+  filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 5px 20px rgba(var(--accent-color-rgb, 255, 215, 0), 0.4);
 }
 
 /* ============================================
@@ -285,7 +320,7 @@ onUnmounted(() => {
 .hamburger span {
   width: 100%;
   height: 3px;
-  background: #ffd700;
+  background: var(--accent-color, #ffd700);
   border-radius: 3px;
   transition: all 0.4s ease;
 }
@@ -315,7 +350,7 @@ onUnmounted(() => {
   background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border-left: 1px solid rgba(255, 215, 0, 0.2);
+  border-left: 1px solid rgba(var(--accent-color-rgb, 255, 215, 0), 0.2);
   padding: 100px 30px 40px;
   z-index: 1000;
   overflow-y: auto;
@@ -332,13 +367,14 @@ onUnmounted(() => {
   font-size: 18px;
   font-weight: 500;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+  border-bottom: 1px solid rgba(var(--accent-color-rgb, 255, 215, 0), 0.1);
   transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .mobile-nav a:hover,
 .mobile-nav a.router-link-active {
-  color: #ffd700;
+  color: var(--accent-color, #ffd700);
   transform: translateX(10px);
 }
 
@@ -348,7 +384,7 @@ onUnmounted(() => {
   gap: 12px;
   margin-top: 30px;
   padding-top: 30px;
-  border-top: 1px solid rgba(255, 215, 0, 0.2);
+  border-top: 1px solid rgba(var(--accent-color-rgb, 255, 215, 0), 0.2);
 }
 
 .mobile-auth .btn-login,

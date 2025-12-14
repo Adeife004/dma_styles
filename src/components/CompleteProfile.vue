@@ -218,7 +218,7 @@ async function completeProfile() {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffd700, #d4af37);
+  background: linear-gradient(135deg, var(--theme-color), #d4af37);
   color: #000;
   display: flex;
   align-items: center;
@@ -230,7 +230,7 @@ async function completeProfile() {
 }
 
 .profile-header h2 {
-  color: #ffd700;
+  color: var(--theme-color);
   margin-bottom: 0.5rem;
   font-size: 1.8rem;
 }
@@ -270,14 +270,14 @@ input {
 }
 
 input:focus {
-  border-color: #ffd700;
+  border-color: var(--theme-color);
   outline: none;
   box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
 }
 
 .btn {
   width: 100%;
-  background: #ffd700;
+  background: var(--theme-color);
   border: none;
   padding: 12px;
   color: #000;
@@ -316,7 +316,7 @@ input:focus {
 
 .loader {
   border: 5px solid #222;
-  border-top: 5px solid #ffd700;
+  border-top: 5px solid var(--theme-color);
   border-radius: 50%;
   width: 50px;
   height: 50px;

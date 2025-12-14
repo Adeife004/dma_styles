@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dma-styles.web.app/sitemap.xml

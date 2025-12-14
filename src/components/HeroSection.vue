@@ -6,7 +6,7 @@
         <img src="../assets/logo.png" alt="" class="hero-logo" />
       </div>
       <div class="decorative-line"></div>
-      <h1 class="hero-title">Where <span class="highlight">Elegance</span> Meets Innovation</h1>
+      <h1 class="hero-title"><span class="highlight">Elegance</span> Defined</h1>
       <p class="hero-description">
         Discover timeless pieces crafted with passion, precision, and an unwavering commitment to
         quality. Each creation tells a story of sophistication and style.
@@ -36,7 +36,6 @@ function scrollToSection(sectionId) {
 
 <style scoped>
 .hero {
-  padding-top: 80px;
   position: relative;
   height: 120vh;
   display: flex;
@@ -67,7 +66,11 @@ function scrollToSection(sectionId) {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(var(--theme-color-rgb, 255, 215, 0), 0.1) 0%,
+    transparent 70%
+  );
   z-index: 1;
 }
 
@@ -89,11 +92,11 @@ function scrollToSection(sectionId) {
 .hero-logo {
   width: 150px;
   height: 150px;
-  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.3));
+  filter: drop-shadow(0 0 20px rgba(var(--theme-color-rgb, 255, 215, 0), 0.3));
   animation: logoFloat 3s ease-in-out infinite;
 }
 
-/* Option 1: Floating with gentle pulse */
+/* Floating animation with gentle pulse */
 @keyframes logoFloat {
   0% {
     transform: rotateY(0deg) scale(1);
@@ -118,7 +121,7 @@ function scrollToSection(sectionId) {
 }
 
 .hero-title .highlight {
-  color: #ffd700;
+  color: var(--theme-color, #ffd700);
   font-style: italic;
 }
 
@@ -160,7 +163,7 @@ function scrollToSection(sectionId) {
 }
 
 .btn-primary {
-  background: #ffd700;
+  background: var(--theme-color, #ffd700);
   color: #000000;
 }
 
@@ -185,27 +188,27 @@ function scrollToSection(sectionId) {
 }
 
 .btn-primary:hover {
-  background: #ffed4e;
+  filter: brightness(1.1);
   transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb, 255, 215, 0), 0.4);
 }
 
 .btn-secondary {
   background: transparent;
   color: white;
-  border: 2px solid #ffd700;
+  border: 2px solid var(--theme-color, #ffd700);
 }
 
 .btn-secondary:hover {
-  background: #ffd700;
+  background: var(--theme-color, #ffd700);
   color: #000000;
   transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb, 255, 215, 0), 0.3);
 }
 
 .scroll-indicator {
   position: absolute;
-  bottom: -20px;
+  bottom: -5px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
@@ -216,7 +219,7 @@ function scrollToSection(sectionId) {
   display: block;
   width: 24px;
   height: 40px;
-  border: 2px solid #ffd700;
+  border: 2px solid var(--theme-color, #ffd700);
   border-radius: 20px;
   position: relative;
 }
@@ -229,7 +232,7 @@ function scrollToSection(sectionId) {
   transform: translateX(-50%);
   width: 4px;
   height: 8px;
-  background: #ffd700;
+  background: var(--theme-color, #ffd700);
   border-radius: 2px;
   animation: scrollDown 2s infinite;
 }
@@ -237,7 +240,7 @@ function scrollToSection(sectionId) {
 .decorative-line {
   width: 60px;
   height: 2px;
-  background: #ffd700;
+  background: var(--theme-color, #ffd700);
   margin: 0 auto 0;
   opacity: 0;
   animation: expandLine 1s ease-out 0.5s forwards;
@@ -308,11 +311,6 @@ function scrollToSection(sectionId) {
     font-size: 42px;
   }
 
-  .hero-subtitle {
-    font-size: 12px;
-    letter-spacing: 3px;
-  }
-
   .hero-description {
     font-size: 16px;
   }
@@ -330,6 +328,12 @@ function scrollToSection(sectionId) {
   .btn {
     width: 80%;
     max-width: 300px;
+  }
+}
+
+@media (max-width: 320px) {
+  .hero {
+    height: 150vh;
   }
 }
 </style>

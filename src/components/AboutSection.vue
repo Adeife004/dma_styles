@@ -5,53 +5,47 @@
         <!-- Left Side - Images -->
         <div class="about-images">
           <div class="image-main">
-            <img
-              src="https://images.unsplash.com/photo-1558769132-cb1aea1c8347?w=800"
-              alt="DMA Styles Designer"
-            />
+            <img src="../assets/about1.jpeg" alt="Fashion Design Process" />
             <div class="floating-badge">
-              <span class="badge-number">10+</span>
+              <span class="badge-number">7+</span>
               <span class="badge-text">Years Experience</span>
             </div>
           </div>
           <div class="image-secondary">
-            <img
-              src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600"
-              alt="Fashion Design Process"
-            />
+            <img src="../assets/about.jpeg" alt="DMA Styles Designer" />
           </div>
-          <div class="decorative-box"></div>
+          <!-- <div class="decorative-box"></div> -->
         </div>
 
         <!-- Right Side - Content -->
         <div class="about-content">
           <span class="subtitle">About Us</span>
-          <h2 class="section-title">
-            Crafting <span class="highlight">Timeless Elegance</span> Since 2014
-          </h2>
+          <h2 class="section-title"><span class="highlight">Elegance Defined </span> Since 2018</h2>
           <p class="description">
-            At DMA Styles, we believe fashion is more than clothing—it's an expression of identity,
-            confidence, and artistry. Every stitch tells a story, and every design is a masterpiece
-            crafted with passion and precision.
+            At DMA Styles, we believe fashion is more than appearance it's a celebration of
+            elegance, culture, and individuality. Whether it's a bridal gown, a formal ensemble, or
+            a traditional piece, every outfit is a story of grace. Each stitch defines elegance,
+            handcrafted with precision and purpose.
           </p>
           <p class="description">
-            With over a decade of experience in bespoke tailoring and fashion design, we've helped
-            hundreds of clients discover their unique style. From elegant formal wear to stunning
-            bridal collections, we bring your vision to life with exceptional craftsmanship.
+            With great expertise over the years in bridal couture, formal tailoring, and traditional
+            wear, we've helped countless clients express their identity through timeless fashion.
+            From regal bridal dresses to sophisticated formal styles and richly crafted traditional
+            attire, DMA Styles transforms your vision into elegance beautifully defined.
           </p>
 
           <!-- Stats -->
           <div class="stats-grid">
             <div class="stat-item">
-              <h3 class="stat-number">500+</h3>
+              <h3 class="stat-number">100+</h3>
               <p class="stat-label">Happy Clients</p>
             </div>
             <div class="stat-item">
-              <h3 class="stat-number">1000+</h3>
+              <h3 class="stat-number">80+</h3>
               <p class="stat-label">Designs Created</p>
             </div>
             <div class="stat-item">
-              <h3 class="stat-number">15+</h3>
+              <h3 class="stat-number">2</h3>
               <p class="stat-label">Awards Won</p>
             </div>
           </div>
@@ -82,16 +76,15 @@
           </div>
 
           <!-- CTA Button -->
-          <button class="btn-primary">Learn More About Us</button>
+          <!-- <button class="btn-primary">Learn More About Us</button> -->
+          <!-- NOTHING TO LEARN ABOUT HER YET SHE NEVER GEH STORY -->
         </div>
       </div>
     </div>
   </section>
 </template>
 
-<script setup>
-// No reactive data needed for this static section
-</script>
+<script setup></script>
 
 <style scoped>
 .about-section {
@@ -108,7 +101,11 @@
   right: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.08) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(var(--theme-color-rgb, 255, 215, 0), 0.08) 0%,
+    transparent 70%
+  );
   pointer-events: none;
 }
 
@@ -152,12 +149,12 @@
   position: absolute;
   bottom: 30px;
   right: 30px;
-  background: rgba(255, 215, 0, 0.95);
+  background: var(--theme-color, #ffd700);
   backdrop-filter: blur(10px);
   padding: 25px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb, 255, 215, 0), 0.3);
   animation: float 3s ease-in-out infinite;
 }
 
@@ -204,7 +201,7 @@
   right: -30px;
   width: 200px;
   height: 200px;
-  border: 3px solid #ffd700;
+  border: 3px solid var(--theme-color, #ffd700);
   border-radius: 12px;
   z-index: 1;
 }
@@ -220,7 +217,7 @@
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: #ffd700;
+  color: var(--theme-color, #ffd700);
   font-weight: 300;
   display: block;
   margin-bottom: 15px;
@@ -236,7 +233,7 @@
 }
 
 .highlight {
-  color: #ffd700;
+  color: var(--theme-color, #ffd700);
   font-style: italic;
 }
 
@@ -254,8 +251,8 @@
   gap: 30px;
   margin: 40px 0;
   padding: 40px 0;
-  border-top: 1px solid rgba(255, 215, 0, 0.2);
-  border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+  border-top: 1px solid rgba(var(--theme-color-rgb, 255, 215, 0), 0.2);
+  border-bottom: 1px solid rgba(var(--theme-color-rgb, 255, 215, 0), 0.2);
 }
 
 .stat-item {
@@ -265,7 +262,7 @@
 .stat-number {
   font-family: 'Playfair Display', serif;
   font-size: 42px;
-  color: #ffd700;
+  color: var(--theme-color, #ffd700);
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -295,8 +292,8 @@
   font-size: 32px;
   width: 60px;
   height: 60px;
-  background: rgba(255, 215, 0, 0.1);
-  border: 2px solid rgba(255, 215, 0, 0.3);
+  background: rgba(var(--theme-color-rgb, 255, 215, 0), 0.1);
+  border: 2px solid rgba(var(--theme-color-rgb, 255, 215, 0), 0.3);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -325,7 +322,7 @@
 .btn-primary {
   margin-top: 40px;
   padding: 16px 40px;
-  background: #ffd700;
+  background: var(--theme-color, #ffd700);
   color: #000;
   border: none;
   font-size: 14px;
@@ -353,9 +350,9 @@
 }
 
 .btn-primary:hover {
-  background: #ffed4e;
+  filter: brightness(1.1);
   transform: translateY(-3px);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+  box-shadow: 0 10px 30px rgba(var(--theme-color-rgb, 255, 215, 0), 0.4);
 }
 
 /* Animations */
@@ -428,7 +425,7 @@
   .image-secondary {
     width: 200px;
     height: 250px;
-    left: -20px;
+    left: -60px;
     bottom: -20px;
   }
 
@@ -440,7 +437,6 @@
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
     gap: 20px;
   }
 
@@ -456,6 +452,47 @@
     width: 50px;
     height: 50px;
     font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .image-secondary {
+    left: -10px;
+  }
+
+  .floating-badge {
+    padding: 10px;
+    right: 10px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .badge-number {
+    font-size: 20px;
+  }
+
+  .badge-text {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 369px) {
+  .floating-badge {
+    padding: 5px;
+    right: 8px;
+  }
+}
+
+@media (max-width: 349px) {
+  .floating-badge {
+    right: 5px;
+  }
+
+  .badge-text {
+    font-size: 6px;
   }
 }
 </style>
